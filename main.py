@@ -6,4 +6,4 @@ for linha in ref_arq:
     print("Documento de Identidade: ", itens[5])
     print("Data de Nascimento: ", itens[6])
     print("\n\n")
-ref_arq.close()
+ref_arq.close()//
