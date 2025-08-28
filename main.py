@@ -1,3 +1,7 @@
+import os
+if not os.path.exists("dados"):
+    os.mkdir("dados")
+
 class No:
     def __init__(self, codigo, endereco):
         self.codigo = codigo
