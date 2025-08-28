@@ -80,8 +80,6 @@ class ArvoreBinaria:
 arvore = ArvoreBinaria()
 
 
-
-
 class Cidade:
     def __init__(self, cod, descricao, estado):
         self.cod = cod
@@ -118,13 +116,68 @@ class Matricula:
         self.qtdeAulas = qtdeAulas
 
 
-def buscar():
+def inserirCidade():
+        arquivo= open("dados/cidades.txt", "r")
+        for linha in arquivo:
+            item = linha.split()
+            while True:
+                item = linha.split()
+                cod = int(input("Digite o codigo da cidade (0 cancela): "))
+                if int(item[0]) == cod:
+                    print("Codigo de cidade já existe!")
+                    continue
+                else:
+                    break
+            arquivo = open("dados/cidades.txt", "a", encoding="utf-8")
+            descricao = input("Digite o descricao da cidade: ")
+            estado = input("Digite o estado da cidade: ")
 
-def consultar():
+            cidade = Cidade(cod, descricao, estado)
 
-def deletar():
+            linha = f"{cidade.cod} {cidade.descricao} {cidade.estado}\n"
+            arquivo.write(linha)
+            print("Arquivo salvo com sucesso!")
 
-def leituraExaustiva():
+
+def buscarCidade():
+    arquivo = open("dados/cidades.txt", "r")
+    busca = int(input("Digite o codigo da cidade: "))
+    for linha in arquivo:
+        itens = linha.split()
+        if(busca == int(itens[0])):
+            print("Codigo: ", itens[0])
+            print("Descricao: ", itens[1])
+            print("Estado: ", itens[2])
+            print("\n\n")
+            return
+    arquivo.close()
+
+
+def menu():
+    while True:
+        print("\n--- MENU ---")
+        print("1 - Inserir")
+        print("2 - Listar")
+        print("3 - Buscar")
+        print("0 - Sair")
+        opcao = input("Escolha: ")
+
+        if opcao == "1":
+            opcao= input("1- Inserir Aluno \n2- Inserir Cidade \n3- Inserir Matricula \n4- Inserir Modalidade \n5- Professores\n Escolha: ")
+            if(opcao == "1"):
+                return
+            elif (opcao == "2"):
+                inserirCidade()
+
+        if opcao == "3":
+            buscarCidade()
+        elif opcao == "0":
+            break
+        else:
+            print("Opção inválida!")
+
+menu()
+
 
 
 
