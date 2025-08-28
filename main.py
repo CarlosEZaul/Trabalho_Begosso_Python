@@ -135,20 +135,20 @@ class Matricula:
 #-----------------CIDADES-----------------------------#
 def carregarIndiceCidades():
     try:
-        with open("dados/cidades.txt", "r", encoding="utf-8") as arquivo:
-            while True:
-                posicao = arquivo.tell()
-                linha = arquivo.readline()
-                if not linha:
-                    break
-                itens = linha.strip().split(";")
-                if len(itens) < 1:
-                    continue
-                try:
-                    codigo = int(itens[0])
-                    arvoreCidades.inserir(codigo, posicao)
-                except ValueError:
-                    continue
+        arquivo= open("dados/cidades.txt", "r", encoding="utf-8")
+        while True:
+            posicao = arquivo.tell()
+            linha = arquivo.readline()
+            if not linha:
+                break
+            itens = linha.strip().split(";")
+            if len(itens) < 1:
+                continue
+            try:
+                codigo = int(itens[0])
+                arvoreCidades.inserir(codigo, posicao)
+            except ValueError:
+                continue
     except FileNotFoundError:
         open("dados/cidades.txt", "w", encoding="utf-8").close()
 
