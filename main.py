@@ -207,6 +207,7 @@ def buscarCidade():
     print("Codigo: ", cidade.cod)
     print("Descricao: ", cidade.descricao)
     print("Estado: ", cidade.estado)
+    arquivo.close()
     print("\n\n")
 
 def excluirCidade():
@@ -260,7 +261,7 @@ def carregarIndiceAlunos():
             except ValueError:
                 continue
     except FileNotFoundError:
-        open("dados/cidades.txt", "w", encoding="utf-8").close()
+        open("dados/alunos.txt", "w", encoding="utf-8").close()
 
 def inserirAluno():
     while True:
@@ -353,7 +354,7 @@ def buscarAluno():
     imc, diagnostico = aluno.imc()
     print(f"IMC: {imc:.2f}")
     print("Diagnostico: ", diagnostico)
-
+    arquivo.close()
     print("\n\n")
 
 def excluirAluno():
@@ -387,6 +388,114 @@ def excluirAluno():
 
     print("Aluno excluída com sucesso!")
 
+
+#------------------------------------------------------------------#
+
+#-------------------------Professor-----------------------------------#
+def carregarIndiceProfessor():
+    try:
+        arquivo = open("dados/professor.txt", "r", encoding="utf-8")
+        while True:
+            posicao = arquivo.tell()
+            linha = arquivo.readline()
+            if not linha:
+                break
+            itens = linha.strip().split(";")
+            if len(itens) < 1:
+                continue
+            try:
+                codigo = int(itens[0])
+                arvoreProfessores.inserir(codigo, posicao)
+            except ValueError:
+                continue
+    except FileNotFoundError:
+        open("dados/professor.txt", "w", encoding="utf-8").close()
+
+def inserirProfessor():
+    while True:
+        try:
+            cod = int(input("Digite o codigo do Professor (0 cancela): "))
+        except:
+            print("Apenas valor inteiro!")
+            continue
+
+        if cod == 0:
+            print("Operação cancelada.")
+            return
+        if arvoreProfessores.buscar(cod) is not None:
+            print("Codigo de professor já existe!")
+            continue
+
+        nome = input("Digite o nome do professor: ")
+
+        while True:
+            try:
+                codCidade = int(input("Código da Cidade: "))
+            except:
+                print("Apenas valor inteiro!")
+                continue
+
+            if arvoreCidades.buscar(codCidade) is not None:
+                break
+            else:
+                print("Código de cidade não encontrado")
+                return
+
+        endereco = input("Endereço do professor: ")
+
+        telefone = input("Telefone: ")
+
+
+        professor = Professor( cod, nome, endereco, telefone, codCidade)
+
+        linha = f"{professor.cod};{professor.nome};{professor.endereco};{professor.telefone};{professor.codCidade}\n"
+
+        arquivo = open("dados/professor.txt", "a", encoding="utf-8")
+        posicao = arquivo.tell()
+        arquivo.write(linha)
+        arvoreProfessores.inserir(cod, posicao)
+
+        print("Professor salvo com sucesso!")
+        break
+
+def buscarProfessor():
+    try:
+        busca = int(input("Digite o codigo do Professor: "))
+    except:
+        print("Apenas valor inteiro!")
+        return
+
+    posicao = arvoreProfessores.buscar(busca)
+    if posicao is None:
+        print("Professor não encontrado no índice!")
+        return
+
+    arquivo = open("dados/professor.txt", "r", encoding="utf-8")
+    arquivo.seek(posicao)
+    linha = arquivo.readline()
+    itens = linha.strip().split(";")
+    professor = Professor(int(itens[0]), itens[1], itens[2], itens[3], int(itens[4]))
+    codCidade = professor.codCidade
+    posicaoCidade = arvoreCidades.buscar(codCidade)
+    if posicaoCidade is None:
+        nomeCidade = "Cidade não encontrada!"
+        nomeEstado = ""
+    else:
+        arquivo = open("dados/cidades.txt", "r", encoding="utf-8")
+        arquivo.seek(posicaoCidade)
+        linha = arquivo.readline()
+        itens = linha.strip().split(";")
+        nomeCidade = itens[1]
+        nomeEstado = itens[2]
+
+    print("Nome do Professor: ", professor.nome)
+    print("Telefone: ", professor.telefone)
+    print("Endereço: ", professor.endereco)
+    print("Cidade: ", nomeCidade)
+    print("Nome do Estado: ", nomeEstado)
+    arquivo.close()
+    print("\n\n")
+
 #---------------------------MENU---------------------------------------#
 def menu():
     while True:
@@ -408,6 +517,8 @@ def menu():
                 inserirAluno()
             elif (opcao == "2"):
                 inserirCidade()
+            elif (opcao == "5"):
+                inserirProfessor()
 #----------------BUSCAR----------------------#
         elif opcao == "2":
             opcao = input("1- Buscar Aluno \n"
@@ -419,6 +530,8 @@ def menu():
                 buscarAluno()
             elif (opcao == "2"):
                 buscarCidade()
+            elif (opcao == "5"):
+                buscarProfessor()
 # ----------------DELETAR----------------------#
         elif opcao == "3":
             opcao = input("1- Deletar Aluno \n"
@@ -437,6 +550,7 @@ def menu():
             continue
 carregarIndiceCidades()
 carregarIndiceAlunos()
+carregarIndiceProfessor()
 menu()
 
 
