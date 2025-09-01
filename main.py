@@ -1,4 +1,5 @@
 import os
+
 if not os.path.exists("dados"):
     os.mkdir("dados")
 
@@ -103,6 +104,8 @@ class Aluno:
         self.peso = peso
         self.altura = altura
     def imc(self):
+        if self.altura <= 0:
+            return 0, "Altura inválida"
         imc = self.peso / (self.altura**2)
         if imc < 18.5:
             diagnostico = "Abaixo do peso"
@@ -311,6 +314,7 @@ def inserirAluno():
         posicao = arquivo.tell()
         arquivo.write(linha)
         arvoreAlunos.inserir(cod, posicao)
+        arquivo.close()
 
         print("Aluno salvo com sucesso!")
         break
@@ -332,6 +336,7 @@ def buscarAluno():
     linha = arquivo.readline()
     itens = linha.strip().split(";")
     aluno = Aluno(int(itens[0]), itens[1], int(itens[2]), itens[3], float(itens[4]), float(itens[5]))
+    arquivo.close()
     codCidade = aluno.codCidade
     posicaoCidade = arvoreCidades.buscar(codCidade)
     if posicaoCidade is None:
@@ -477,6 +482,7 @@ def buscarProfessor():
     professor = Professor(int(itens[0]), itens[1], itens[2], itens[3], int(itens[4]))
     codCidade = professor.codCidade
     posicaoCidade = arvoreCidades.buscar(codCidade)
+
     if posicaoCidade is None:
         nomeCidade = "Cidade não encontrada!"
         nomeEstado = ""
@@ -495,6 +501,211 @@ def buscarProfessor():
     print("Nome do Estado: ", nomeEstado)
     arquivo.close()
     print("\n\n")
+
+def excluirProfessor():
+    try:
+        cod = int(input("Digite o código do professor para excluir (0 cancela): "))
+    except:
+        print("Apenas valor inteiro!")
+        return
+
+    if cod == 0:
+        print("Operação cancelada.")
+        return
+
+    if arvoreProfessores.buscar(cod) is None:
+        print("Professor não encontrado!")
+        return
+
+    arquivo = open("dados/professor.txt", "r", encoding="utf-8")
+    linhas = arquivo.readlines()
+    arquivo.close()
+
+    arquivo = open("dados/professor.txt", "w", encoding="utf-8")
+    arvoreProfessores.raiz = None
+    for linha in linhas:
+        itens = linha.strip().split(";")
+        if int(itens[0]) != cod:
+            professor = Professor(
+                int(itens[0]), itens[1], itens[2], itens[3], int(itens[4])
+            )
+            posicao = arquivo.tell()
+            linha = f"{professor.cod};{professor.nome};{professor.endereco};{professor.telefone};{professor.codCidade}\n"
+            arquivo.write(linha)
+            arvoreProfessores.inserir(professor.cod, posicao)
+
+    arquivo.close()
+    print("Professor excluído com sucesso!")
+
+
+#-----------------------MODALIDADES_____________________________________#
+def carregarIndiceModalidades():
+    try:
+        arquivo = open("dados/modalidades.txt", "r", encoding="utf-8")
+        while True:
+            posicao = arquivo.tell()
+            linha = arquivo.readline()
+            if not linha:
+                break
+            itens = linha.strip().split(";")
+            if len(itens) < 1:
+                continue
+            try:
+                codigo = int(itens[0])
+                arvoreModalidades.inserir(codigo, posicao)
+            except ValueError:
+                continue
+    except FileNotFoundError:
+        open("dados/modalidades.txt", "w", encoding="utf-8").close()
+
+def inserirModalidade():
+    while True:
+        try:
+            cod = int(input("Digite o codigo da modalidade (0 cancela): "))
+        except:
+            print("Apenas valor inteiro!")
+            continue
+
+        if cod == 0:
+            print("Operação cancelada.")
+            return
+        if arvoreModalidades.buscar(cod) is not None:
+            print("Codigo de modalidade já existe!")
+            continue
+        descricao = input("Descrição da Modalidade: ")
+
+        while True:
+            try:
+                codProfessor = int(input("Código do professor: "))
+            except:
+                print("Apenas valor inteiro!")
+                continue
+
+            if arvoreProfessores.buscar(codProfessor) is not None:
+                break
+            else:
+                print("Código de professor não encontrado")
+                return
+
+        try:
+            valor = float(input("Valor da aula: "))
+        except:
+            print("Apenas valor real!")
+            continue
+
+        try:
+            limiteAlunos = int(input("Limite de alunos: "))
+        except:
+            print("Apenas valor inteiro!")
+            continue
+
+        totalAlunos = 0
+
+        modalidade = Modalidade(cod, descricao, codProfessor, valor, limiteAlunos, totalAlunos)
+
+        linha = f"{modalidade.cod};{modalidade.descricao};{modalidade.codProfessor};{modalidade.valor};{modalidade.limiteAlunos};{modalidade.totalAlunos}\n"
+        arquivo = open("dados/modalidades.txt", "a", encoding="utf-8")
+        posicao = arquivo.tell()
+        arquivo.write(linha)
+        arvoreModalidades.inserir(cod, posicao)
+        arquivo.close()
+        print("Modalidade cadastrada com sucesso!\n")
+        buscarModalidade(cod)
+        break
+
+def buscarModalidade(codBusca):
+    try:
+        if codBusca is None:
+            busca = int(input("Digite o codigo da Modalidade: "))
+        else:
+            busca = int(codBusca)
+    except:
+        print("Apenas valor inteiro!")
+        return
+    posicao = arvoreModalidades.buscar(busca)
+
+    if posicao is None:
+        print("Modalidade não encontrada no índice!")
+        return
+
+    arquivo = open("dados/modalidades.txt", "r", encoding="utf-8")
+    arquivo.seek(posicao)
+    linha = arquivo.readline()
+    itens = linha.strip().split(";")
+    modalidade = Modalidade(int(itens[0]), itens[1], int(itens[2]), float(itens[3]), int(itens[4]), int(itens[5]))
+    codProfessor = modalidade.codProfessor
+    posicaoProfessor = arvoreProfessores.buscar(codProfessor)
+    arquivo.close()
+
+    if posicaoProfessor is None:
+        nomeProfessor = "Professor não encontrado!"
+        nomeCidade = ""
+    else:
+        arquivo = open("dados/professor.txt", "r", encoding="utf-8")
+        arquivo.seek(posicaoProfessor)
+        linha = arquivo.readline()
+        itens = linha.strip().split(";")
+        nomeProfessor = itens[1]
+        codCidade = int(itens[4])
+        posicaoCidade = arvoreCidades.buscar(codCidade)
+
+        if posicaoCidade is None:
+            nomeCidade = "Cidade não encontrada!"
+        else:
+            arquivo = open("dados/cidades.txt", "r", encoding="utf-8")
+            arquivo.seek(posicaoCidade)
+            linha = arquivo.readline()
+            itens = linha.strip().split(";")
+            nomeCidade = itens[1]
+
+    print("Descricão da Modalidade: ", modalidade.descricao)
+    print("Professor: ",nomeProfessor)
+    print("Cidade do Professor: ", nomeCidade)
+    print("Valor da aula: ",modalidade.valor)
+    print("Limite de alunos: ",modalidade.limiteAlunos)
+    print("Total de alunos: ",modalidade.totalAlunos)
+    arquivo.close()
+    print("\n\n")
+
+def excluirModalidade():
+    try:
+        cod = int(input("Digite o código da modalidade para excluir (0 cancela): "))
+    except:
+        print("Apenas valor inteiro!")
+        return
+
+    if cod == 0:
+        print("Operação cancelada.")
+        return
+
+    if arvoreModalidades.buscar(cod) is None:
+        print("Modalidade não encontrada!")
+        return
+
+    arquivo = open("dados/modalidades.txt", "r", encoding="utf-8")
+    linhas = arquivo.readlines()
+    arquivo.close()
+
+    arquivo = open("dados/modalidades.txt", "w", encoding="utf-8")
+    arvoreModalidades.raiz = None
+    for linha in linhas:
+        itens = linha.strip().split(";")
+        if int(itens[0]) != cod:
+            modalidade = Modalidade(
+                int(itens[0]), itens[1], int(itens[2]),
+                float(itens[3]), int(itens[4]), int(itens[5])
+            )
+            posicao = arquivo.tell()
+            linha = f"{modalidade.cod};{modalidade.descricao};{modalidade.codProfessor};{modalidade.valor};{modalidade.limiteAlunos};{modalidade.totalAlunos}\n"
+            arquivo.write(linha)
+            arvoreModalidades.inserir(modalidade.cod, posicao)
+
+    arquivo.close()
+    print("Modalidade excluída com sucesso!")
+
+
+
+
 
 #---------------------------MENU---------------------------------------#
 def menu():
@@ -517,6 +728,8 @@ def menu():
                 inserirAluno()
             elif (opcao == "2"):
                 inserirCidade()
+            elif (opcao == "4"):
+                inserirModalidade()
             elif (opcao == "5"):
                 inserirProfessor()
 #----------------BUSCAR----------------------#
@@ -530,6 +743,8 @@ def menu():
                 buscarAluno()
             elif (opcao == "2"):
                 buscarCidade()
+            elif (opcao =="4"):
+                buscarModalidade(None)
             elif (opcao == "5"):
                 buscarProfessor()
 # ----------------DELETAR----------------------#
@@ -543,6 +758,10 @@ def menu():
                 excluirAluno()
             elif (opcao == "2"):
                 excluirCidade()
+            elif (opcao == "4"):
+                excluirModalidade()
+            elif (opcao == "5"):
+                excluirProfessor()
 #-----------------SAIR---------------------#
         elif opcao == "0":
             break
@@ -551,10 +770,5 @@ def menu():
 carregarIndiceCidades()
 carregarIndiceAlunos()
 carregarIndiceProfessor()
+carregarIndiceModalidades()
 menu()
-
-
-
-
-
-
