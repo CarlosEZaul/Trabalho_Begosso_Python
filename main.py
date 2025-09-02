@@ -294,7 +294,7 @@ def inserirAluno():
                 break
             else:
                 print("Código de cidade não encontrado")
-                return
+                continue
 
         dataNascimento = input("Data de Nascimento: ")
         while True:
@@ -356,9 +356,11 @@ def buscarAluno():
     print("Nome do Estado: ", nomeEstado)
     print("Peso: ", aluno.peso)
     print("Altura: ", aluno.altura)
+
     imc, diagnostico = aluno.imc()
     print(f"IMC: {imc:.2f}")
     print("Diagnostico: ", diagnostico)
+
     arquivo.close()
     print("\n\n")
 
@@ -393,8 +395,6 @@ def excluirAluno():
 
     print("Aluno excluída com sucesso!")
 
-
-#------------------------------------------------------------------#
 
 #-------------------------Professor-----------------------------------#
 def carregarIndiceProfessor():
@@ -444,7 +444,7 @@ def inserirProfessor():
                 break
             else:
                 print("Código de cidade não encontrado")
-                return
+                continue
 
         endereco = input("Endereço do professor: ")
 
@@ -585,7 +585,7 @@ def inserirModalidade():
                 break
             else:
                 print("Código de professor não encontrado")
-                return
+                continue
 
         try:
             valor = float(input("Valor da aula: "))
@@ -611,7 +611,7 @@ def inserirModalidade():
         arquivo.close()
         print("Modalidade cadastrada com sucesso!\n")
         buscarModalidade(cod)
-        break
+
 
 def buscarModalidade(codBusca):
     try:
@@ -703,6 +703,184 @@ def excluirModalidade():
     arquivo.close()
     print("Modalidade excluída com sucesso!")
 
+#------------------------MATRÍCULA----------------------------#
+def carregarIndiceMatriculas():
+    try:
+        arquivo = open("dados/matriculas.txt", "r", encoding="utf-8")
+        while True:
+            posicao = arquivo.tell()
+            linha = arquivo.readline()
+            if not linha:
+                break
+            itens = linha.strip().split(";")
+            if len(itens) < 1:
+                continue
+            try:
+                codigo = int(itens[0])
+                arvoreMatriculas.inserir(codigo, posicao)
+            except ValueError:
+                continue
+    except FileNotFoundError:
+        open("dados/matriculas.txt", "w", encoding="utf-8").close()
+
+
+def inserirMatricula():
+    while True:
+        try:
+            cod = int(input("Código da matricula (0 cancela): "))
+        except:
+            print("Apenas valor inteiro!")
+            continue
+
+        if cod == 0:
+            print("Operação cancelada.")
+            return
+
+        if arvoreMatriculas.buscar(cod) is not None:
+            print("Código de matrícula já existe!")
+            continue
+
+        while True:
+            try:
+                codAluno = int(input("Código do Aluno: "))
+            except:
+                print("Apenas valor inteiro!")
+                continue
+
+            posicaoAluno = arvoreAlunos.buscar(codAluno)
+            if posicaoAluno is not None:
+                arquivo = open("dados/alunos.txt", "r", encoding="utf-8")
+                arquivo.seek(posicaoAluno)
+                itens = arquivo.readline().strip().split(";")
+                nomeAluno = itens[1]
+                codCidade = int(itens[2])
+                arquivo.close()
+
+                posicaoCidade = arvoreCidades.buscar(codCidade)
+                if posicaoCidade is None:
+                    nomeCidade = ""
+                else:
+                    arquivo = open("dados/cidades.txt", "r", encoding="utf-8")
+                    arquivo.seek(posicaoCidade)
+                    itens = arquivo.readline().strip().split(";")
+                    nomeCidade = itens[1]
+                    arquivo.close()
+                break
+            else:
+                print("Aluno não encontrado.")
+
+        while True:
+            try:
+                codModalidade = int(input("Código da Modalidade: "))
+            except:
+                print("Apenas valor inteiro!")
+                continue
+
+            posicaoModalidade = arvoreModalidades.buscar(codModalidade)
+            if posicaoModalidade is not None:
+                arquivo = open("dados/modalidades.txt", "r+", encoding="utf-8")
+                arquivo.seek(posicaoModalidade)
+                itens = arquivo.readline().strip().split(";")
+                descricaoModalidade = itens[1]
+                valorDaAula = float(itens[3])
+                limiteAlunos = int(itens[4])
+                totalAlunos = int(itens[5])
+
+                if totalAlunos >= limiteAlunos:
+                    print(f"Limite de {limiteAlunos} alunos atingido.")
+                    arquivo.close()
+                    return
+
+                totalAlunos += 1
+                arquivo.seek(posicaoModalidade)
+                arquivo.write(f"{itens[0]};{itens[1]};{itens[2]};{itens[3]};{itens[4]};{totalAlunos}\n")
+                arquivo.close()
+                break
+            else:
+                print("Modalidade não encontrada.")
+
+        while True:
+            try:
+                qtdeAulas = int(input("Quantidade de aulas: "))
+                break
+            except:
+                print("Apenas valor inteiro!")
+
+        matricula = Matricula(cod, codAluno, codModalidade, qtdeAulas)
+        arquivo = open("dados/matriculas.txt", "a", encoding="utf-8")
+        posicao = arquivo.tell()
+        linha = f"{matricula.cod};{matricula.codAluno};{matricula.codModalidade};{matricula.qtdeAulas}"
+        arquivo.write(linha)
+        arvoreMatriculas.inserir(matricula.cod, posicao)
+        arquivo.close()
+
+        print("Matrícula cadastrada com sucesso!\n")
+        print("Nome do Aluno Cadastrado: ", nomeAluno)
+        print("Cidade do aluno: ", nomeCidade)
+        print("Modalidade: ", descricaoModalidade)
+        print(f"Valor a ser pago: {valorDaAula * matricula.qtdeAulas:.2f}")
+        print("\n\n")
+        break
+
+def buscarMatricula():
+    try:
+        busca = int(input("Digite o código da matricula: "))
+    except:
+        print("Apenas valor inteiro!")
+        return
+
+    posicao = arvoreMatriculas.buscar(busca)
+    if posicao is None:
+        print("Matrícula não encontrada no índice!")
+        return
+
+    arquivo = open("dados/matriculas.txt", "r", encoding="utf-8")
+    arquivo.seek(posicao)
+    linha = arquivo.readline()
+    itens = linha.strip().split(";")
+    matricula = Matricula(int(itens[0]), int(itens[1]), int(itens[2]), int(itens[3]))
+    arquivo.close()
+    codAluno = matricula.codAluno
+    codModalidade= matricula.codModalidade
+
+    posicaoAluno = arvoreAlunos.buscar(codAluno)
+    if posicaoAluno is None:
+        nomeAluno = "Aluno não encontrado"
+        nomeCidade = ""
+    else:
+        arquivo = open("dados/alunos.txt", "r", encoding="utf-8")
+        arquivo.seek(posicaoAluno)
+        linha = arquivo.readline()
+        itens = linha.strip().split(";")
+        nomeAluno = itens[1]
+        codCidade = int(itens[2])
+        arquivo.close()
+
+    posicaoCidade = arvoreCidades.buscar(codCidade)
+    if posicaoCidade is None:
+        nomeCidade = ""
+    else:
+        arquivo = open("dados/cidades.txt", "r", encoding="utf-8")
+        arquivo.seek(posicaoCidade)
+        linha = arquivo.readline()
+        itens = linha.strip().split(";")
+        nomeCidade = itens[1]
+        arquivo.close()
+
+
+    posicaoModalidade = arvoreModalidades.buscar(codModalidade)
+    if posicaoModalidade is None:
+        descricaoModalidade = "Modalidade não encontrada"
+    else:
+        arquivo = open("dados/modalidades.txt", "r", encoding="utf-8")
+        arquivo.seek(posicaoModalidade)
+        linha = arquivo.readline()
+        itens = linha.strip().split(";")
+        descricaoModalidade = itens[1]
+
+    print("Nome do Aluno Cadastrado: ", nomeAluno)
+    print("Cidade do aluno: ", nomeCidade)
+    print("Modalidade: ", descricaoModalidade)
 
 
 
@@ -728,6 +906,8 @@ def menu():
                 inserirAluno()
             elif (opcao == "2"):
                 inserirCidade()
+            elif (opcao == "3"):
+                inserirMatricula()
             elif (opcao == "4"):
                 inserirModalidade()
             elif (opcao == "5"):
@@ -743,8 +923,11 @@ def menu():
                 buscarAluno()
             elif (opcao == "2"):
                 buscarCidade()
+            elif (opcao == "3"):
+                buscarMatricula()
             elif (opcao =="4"):
                 buscarModalidade(None)
+
             elif (opcao == "5"):
                 buscarProfessor()
 # ----------------DELETAR----------------------#
@@ -771,4 +954,5 @@ carregarIndiceCidades()
 carregarIndiceAlunos()
 carregarIndiceProfessor()
 carregarIndiceModalidades()
+carregarIndiceMatriculas()
 menu()
