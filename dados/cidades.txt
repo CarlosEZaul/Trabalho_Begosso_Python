@@ -1,1 +1,1 @@
-45;Assis;SP
+10;Assis;SP
