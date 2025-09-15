@@ -1,5 +1,11 @@
 import os
 
+import customtkinter
+import customtkinter as ctk
+
+
+
+
 class No:
     def __init__(self, codigo, endereco):
         self.codigo = codigo
@@ -1183,4 +1189,20 @@ carregarIndiceProfessor()
 carregarIndiceModalidades()
 carregarIndiceMatriculas()
 
-menu()
+
+
+#Front
+
+#janela
+app = customtkinter.CTk()
+app.title("Trabalho Bagos")
+customtkinter.set_appearance_mode("dark")
+app.geometry("600x500")
+
+#Menu Principal
+label = ctk.CTkLabel(app, text="Menu", fg_color="transparent")
+btnins = ctk.CTkButton(app, text="Inserir", command=menu)
+btnins.pack()
+btnins.configure(width=11, height=1)
+
+app.mainloop()
