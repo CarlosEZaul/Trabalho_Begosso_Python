@@ -1198,9 +1198,13 @@ app = customtkinter.CTk()
 app.title("Trabalho Bagos")
 customtkinter.set_appearance_mode("dark")
 app.geometry("600x500")
+app.resizable(width=False, height=False)
+
+#inconify fecha a janela e deiconify reabre
 
 #Menu Principal
-label = ctk.CTkLabel(app, text="Menu", fg_color="transparent")
+label = ctk.CTkLabel(app, text="Menu", fg_color="blue")
+label.configure(padx=100, pady=10)
 btnins = ctk.CTkButton(app, text="Inserir", command=menu)
 btnins.pack()
 btnins.configure(width=11, height=1)
