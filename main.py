@@ -1195,18 +1195,55 @@ carregarIndiceMatriculas()
 
 #janela
 app = customtkinter.CTk()
-app.title("Trabalho Bagos")
+app.title("Trabalho Bagos - Menu")
 customtkinter.set_appearance_mode("dark")
-app.geometry("600x500")
+app.geometry("1080x720")
 app.resizable(width=False, height=False)
 
 #inconify fecha a janela e deiconify reabre
 
+#novas telas
+
+def tela_inserir():
+    app.iconify()
+    tela_inserir= ctk.CTkToplevel(app)
+    tela_inserir.geometry("1080x720")
+    tela_inserir.title("Trabalho Bagos - Inserir")
+
+def tela_buscar():
+    app.iconify()
+    tela_buscar= ctk.CTkToplevel(app)
+    tela_buscar.geometry("1080x720")
+    tela_buscar.title("Trabalho Bagos - Buscar")
+
+def tela_deletar():
+    app.iconify()
+    tela_deletar= ctk.CTkToplevel(app)
+    tela_deletar.geometry("1080x720")
+    tela_deletar.title("Trabalho Bagos - Deletar")
+
+def tela_totalFaturado():
+    app.iconify()
+    tela_totalFaturado= ctk.CTkToplevel(app)
+    tela_totalFaturado.geometry("1080x720")
+    tela_totalFaturado.title("Trabalho Bagos - Total Faturado")
+
+def tela_leituraExaustiva():
+    app.iconify()
+    tela_leituraExaustiva= ctk.CTkToplevel(app)
+    tela_leituraExaustiva.geometry("1080x720")
+    tela_leituraExaustiva.title("Trabalho Bagos - Leitura Exaustiva")
+
+
+
+
 #Menu Principal
-label = ctk.CTkLabel(app, text="Menu", fg_color="blue")
-label.configure(padx=100, pady=10)
-btnins = ctk.CTkButton(app, text="Inserir", command=menu)
-btnins.pack()
-btnins.configure(width=11, height=1)
+frameteste = ctk.CTkFrame(app, width=540, height=360).place(x=310, y=200)
+btn_inserir= ctk.CTkButton(master=app, text="Inserir", command=tela_inserir).place(x=400, y=260)
+btn_buscar= ctk.CTkButton(master=app, text="Buscar", command=tela_buscar).place(x=600, y=260)
+btn_deletar= ctk.CTkButton(master=app, text="Deletar", command=tela_buscar).place(x=400, y=360)
+btn_leitura= ctk.CTkButton(master=app, text="Leitura Exaustiva", command=tela_buscar).place(x=600, y=360)
+btn_fatura= ctk.CTkButton(master=app, text="Total Faturado", command=tela_buscar).place(x=500, y=460)
+
 
 app.mainloop()
