@@ -138,7 +138,7 @@ class Matricula:
         self.codModalidade = codModalidade
         self.qtdeAulas = qtdeAulas
 
-#-----------------CIDADES-----------------------------#
+#-----------------CIDADES----------------------------#
 def carregarIndiceCidades():
     try:
         arquivo= open("dados/cidades.txt", "r", encoding="utf-8")
