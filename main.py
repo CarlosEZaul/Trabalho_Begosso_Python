@@ -1446,7 +1446,7 @@ carregarIndiceProfessor()
 carregarIndiceModalidades()
 carregarIndiceMatriculas()
 
-menu()
+
 
 #Front
 
@@ -1462,45 +1462,130 @@ app.resizable(width=False, height=False)
 #novas telas
 
 def tela_inserir():
-    app.iconify()
+    app.withdraw()
     tela_inserir= ctk.CTkToplevel(app)
     tela_inserir.geometry("1080x720")
     tela_inserir.title("Trabalho Bagos - Inserir")
+    tela_inserir.resizable(width=False, height=False)
+
+    # Restaura a janela principal
+    def fechar_tela_inserir():
+        tela_inserir.destroy()
+        app.deiconify()
+
+    tela_inserir.protocol("WM_DELETE_WINDOW", fechar_tela_inserir)
+
+    #Seleção de quem vai ser
+    tabview = ctk.CTkTabview(tela_inserir, height=1080, width=720)
+    tabview.pack(fill="both")
+    tabview.add("Alunos")
+    tabview.add("Professores")
+    tabview.add("Matricula")
+    tabview.add("Modalidade")
+    tabview.add("Cidade")
+    tabview.tab("Alunos").grid_columnconfigure(0, weight=1 )
+    tabview.tab("Professores").grid_columnconfigure(0, weight=1)
+    tabview.tab("Matricula").grid_columnconfigure(0, weight=1)
+    tabview.tab("Modalidade").grid_columnconfigure(0, weight=1)
+    tabview.tab("Cidade").grid_columnconfigure(0, weight=1)
+
 
 def tela_buscar():
-    app.iconify()
+    app.withdraw()
     tela_buscar= ctk.CTkToplevel(app)
     tela_buscar.geometry("1080x720")
     tela_buscar.title("Trabalho Bagos - Buscar")
+    tela_buscar.resizable(width=False, height=False)
+
+    # Restaura a janela principal
+    def fechar_tela_buscar():
+        tela_buscar.destroy()
+        app.deiconify()
+
+    tela_buscar.protocol("WM_DELETE_WINDOW", fechar_tela_buscar)
+
+    # Seleção de quem vai ser
+    tabview = ctk.CTkTabview(tela_buscar, height=1080, width=720)
+    tabview.pack(fill="both")
+    tabview.add("Alunos")
+    tabview.add("Professores")
+    tabview.add("Matricula")
+    tabview.add("Modalidade")
+    tabview.add("Cidade")
+    tabview.tab("Alunos").grid_columnconfigure(0, weight=1)
+    tabview.tab("Professores").grid_columnconfigure(0, weight=1)
+    tabview.tab("Matricula").grid_columnconfigure(0, weight=1)
+    tabview.tab("Modalidade").grid_columnconfigure(0, weight=1)
+    tabview.tab("Cidade").grid_columnconfigure(0, weight=1)
+
 
 def tela_deletar():
-    app.iconify()
+    app.withdraw()
     tela_deletar= ctk.CTkToplevel(app)
     tela_deletar.geometry("1080x720")
     tela_deletar.title("Trabalho Bagos - Deletar")
+    tela_deletar.resizable(width=False, height=False)
+
+    # Restaura a janela principal
+    def fechar_tela_deletar():
+        tela_deletar.destroy()
+        app.deiconify()
+
+    tela_deletar.protocol("WM_DELETE_WINDOW", fechar_tela_deletar)
+
+    # Seleção de quem vai ser
+    tabview = ctk.CTkTabview(tela_deletar, height=1080, width=720)
+    tabview.pack(fill="both")
+    tabview.add("Alunos")
+    tabview.add("Professores")
+    tabview.add("Matricula")
+    tabview.add("Modalidade")
+    tabview.add("Cidade")
+    tabview.tab("Alunos").grid_columnconfigure(0, weight=1)
+    tabview.tab("Professores").grid_columnconfigure(0, weight=1)
+    tabview.tab("Matricula").grid_columnconfigure(0, weight=1)
+    tabview.tab("Modalidade").grid_columnconfigure(0, weight=1)
+    tabview.tab("Cidade").grid_columnconfigure(0, weight=1)
+
 
 def tela_totalFaturado():
-    app.iconify()
+    app.withdraw()
     tela_totalFaturado= ctk.CTkToplevel(app)
     tela_totalFaturado.geometry("1080x720")
     tela_totalFaturado.title("Trabalho Bagos - Total Faturado")
+    tela_totalFaturado.resizable(width=False, height=False)
+
+    # Restaura a janela principal
+    def fechar_tela_totalFaturado():
+        tela_totalFaturado.destroy()
+        app.deiconify()
+
+    tela_totalFaturado.protocol("WM_DELETE_WINDOW", fechar_tela_totalFaturado)
 
 def tela_leituraExaustiva():
-    app.iconify()
+    app.withdraw()
     tela_leituraExaustiva= ctk.CTkToplevel(app)
     tela_leituraExaustiva.geometry("1080x720")
     tela_leituraExaustiva.title("Trabalho Bagos - Leitura Exaustiva")
+    tela_leituraExaustiva.resizable(width=False, height=False)
+
+    # Restaura a janela principal
+    def fechar_tela_leituraExaustiva():
+        tela_leituraExaustiva.destroy()
+        app.deiconify()
+
+    tela_leituraExaustiva.protocol("WM_DELETE_WINDOW", fechar_tela_leituraExaustiva)
 
 
 
 
 #Menu Principal
-frameteste = ctk.CTkFrame(app, width=540, height=360).place(x=310, y=200)
+frameteste = ctk.CTkFrame(app, width=540, height=360, corner_radius=30).place(x=310, y=200)
 btn_inserir= ctk.CTkButton(master=app, text="Inserir", command=tela_inserir).place(x=400, y=260)
 btn_buscar= ctk.CTkButton(master=app, text="Buscar", command=tela_buscar).place(x=600, y=260)
-btn_deletar= ctk.CTkButton(master=app, text="Deletar", command=tela_buscar).place(x=400, y=360)
-btn_leitura= ctk.CTkButton(master=app, text="Leitura Exaustiva", command=tela_buscar).place(x=600, y=360)
-btn_fatura= ctk.CTkButton(master=app, text="Total Faturado", command=tela_buscar).place(x=500, y=460)
+btn_deletar= ctk.CTkButton(master=app, text="Deletar", command=tela_deletar).place(x=400, y=360)
+btn_leitura= ctk.CTkButton(master=app, text="Leitura Exaustiva", command=tela_leituraExaustiva).place(x=600, y=360)
+btn_fatura= ctk.CTkButton(master=app, text="Total Faturado", command=tela_totalFaturado).place(x=500, y=460)
 
 
 app.mainloop()
