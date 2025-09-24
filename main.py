@@ -1459,6 +1459,68 @@ app.resizable(width=False, height=False)
 
 #inconify fecha a janela e deiconify reabre
 
+#abas das telas
+
+def aba_inserir_alunos(tab):
+    # Labels e entradas
+    lbl_cod = ctk.CTkLabel(tab, text="Código:")
+    lbl_cod.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+    ent_cod = ctk.CTkEntry(tab)
+    ent_cod.grid(row=0, column=1, padx=10, pady=5)
+
+    lbl_nome = ctk.CTkLabel(tab, text="Nome:")
+    lbl_nome.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+    ent_nome = ctk.CTkEntry(tab)
+    ent_nome.grid(row=1, column=1, padx=10, pady=5)
+
+    lbl_cidade = ctk.CTkLabel(tab, text="Código Cidade:")
+    lbl_cidade.grid(row=2, column=0, padx=10, pady=5, sticky="w")
+    ent_cidade = ctk.CTkEntry(tab)
+    ent_cidade.grid(row=2, column=1, padx=10, pady=5)
+
+    lbl_nasc = ctk.CTkLabel(tab, text="Data Nascimento:")
+    lbl_nasc.grid(row=3, column=0, padx=10, pady=5, sticky="w")
+    ent_nasc = ctk.CTkEntry(tab)
+    ent_nasc.grid(row=3, column=1, padx=10, pady=5)
+
+    lbl_peso = ctk.CTkLabel(tab, text="Peso:")
+    lbl_peso.grid(row=4, column=0, padx=10, pady=5, sticky="w")
+    ent_peso = ctk.CTkEntry(tab)
+    ent_peso.grid(row=4, column=1, padx=10, pady=5)
+
+    lbl_altura = ctk.CTkLabel(tab, text="Altura:")
+    lbl_altura.grid(row=5, column=0, padx=10, pady=5, sticky="w")
+    ent_altura = ctk.CTkEntry(tab)
+    ent_altura.grid(row=5, column=1, padx=10, pady=5)
+
+    # Área de mensagens
+    output = ctk.CTkTextbox(tab, height=150, width=400)
+    output.grid(row=7, column=0, columnspan=2, padx=10, pady=10)
+
+    def salvar_aluno():
+        try:
+            cod = int(ent_cod.get())
+            nome = ent_nome.get()
+            codCidade = int(ent_cidade.get())
+            nasc = ent_nasc.get()
+            peso = float(ent_peso.get())
+            altura = float(ent_altura.get())
+
+            # grava direto no arquivo + árvore
+            aluno = Aluno(cod, nome, codCidade, nasc, peso, altura)
+            linha = f"{aluno.cod};{aluno.nome};{aluno.codCidade};{aluno.dataNascimento};{aluno.peso};{aluno.altura}\n"
+            with open("dados/alunos.txt", "a", encoding="utf-8") as f:
+                posicao = f.tell()
+                f.write(linha)
+                arvoreAlunos.inserir(cod, posicao)
+
+            output.insert("end", f"Aluno {nome} salvo com sucesso!\n")
+        except Exception as e:
+            output.insert("end", f"Erro: {e}\n")
+
+    btn_salvar = ctk.CTkButton(tab, text="Salvar Aluno", command=salvar_aluno)
+    btn_salvar.grid(row=6, column=0, columnspan=2, pady=10)
+
 #novas telas
 
 def tela_inserir():
@@ -1475,8 +1537,8 @@ def tela_inserir():
 
     tela_inserir.protocol("WM_DELETE_WINDOW", fechar_tela_inserir)
 
-    #Seleção de quem vai ser
-    tabview = ctk.CTkTabview(tela_inserir, height=1080, width=720)
+    #Seleção de quem vai ser/navbar
+    tabview = ctk.CTkTabview(tela_inserir, height=1080, width=720, corner_radius=20)
     tabview.pack(fill="both")
     tabview.add("Alunos")
     tabview.add("Professores")
@@ -1488,6 +1550,12 @@ def tela_inserir():
     tabview.tab("Matricula").grid_columnconfigure(0, weight=1)
     tabview.tab("Modalidade").grid_columnconfigure(0, weight=1)
     tabview.tab("Cidade").grid_columnconfigure(0, weight=1)
+
+    aba_inserir_alunos(tabview.tab("Alunos"))
+    # caixas de textos e infos da navbar
+
+    # aluno
+
 
 
 def tela_buscar():
@@ -1505,7 +1573,7 @@ def tela_buscar():
     tela_buscar.protocol("WM_DELETE_WINDOW", fechar_tela_buscar)
 
     # Seleção de quem vai ser
-    tabview = ctk.CTkTabview(tela_buscar, height=1080, width=720)
+    tabview = ctk.CTkTabview(tela_buscar, height=1080, width=720, corner_radius=20)
     tabview.pack(fill="both")
     tabview.add("Alunos")
     tabview.add("Professores")
@@ -1534,7 +1602,7 @@ def tela_deletar():
     tela_deletar.protocol("WM_DELETE_WINDOW", fechar_tela_deletar)
 
     # Seleção de quem vai ser
-    tabview = ctk.CTkTabview(tela_deletar, height=1080, width=720)
+    tabview = ctk.CTkTabview(tela_deletar, height=1080, width=720, corner_radius=20)
     tabview.pack(fill="both")
     tabview.add("Alunos")
     tabview.add("Professores")
