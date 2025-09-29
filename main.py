@@ -789,7 +789,7 @@ def inserirModalidade(cod, descricao, codProf, valor, limite, output=None):
         linha = f"{cod};{descricao};{codProf};{valor};{limite};{total_alunos}\n"
 
 
-        with open("dados/modalidade.txt", "a", encoding="utf-8") as arquivo:
+        with open("dados/modalidades.txt", "a", encoding="utf-8") as arquivo:
             posicao = arquivo.tell()
             arquivo.write(linha)
             arvoreModalidades.inserir(cod, posicao)
@@ -1021,7 +1021,7 @@ def inserirMatricula(cod, codAluno, codModalidade, qtdaulas, output=None):
 
         desc, valor, limite, total_alunos = None, None, None, None
         linhas_modalidade = []
-        with open("dados/modalidade.txt", "r", encoding="utf-8") as arq_mod:
+        with open("dados/modalidades.txt", "r", encoding="utf-8") as arq_mod:
             linhas_modalidade = arq_mod.readlines()
 
         for linha_mod in linhas_modalidade:
@@ -1061,7 +1061,7 @@ def inserirMatricula(cod, codAluno, codModalidade, qtdaulas, output=None):
             arvoreMatriculas.inserir(cod, posicao)
 
 
-        with open("dados/modalidade.txt", "w", encoding="utf-8") as arq_mod:
+        with open("dados/modalidades.txt", "w", encoding="utf-8") as arq_mod:
             for linha_mod in linhas_modalidade:
                 partes = linha_mod.strip().split(";")
                 if int(partes[0]) == codModalidade:
@@ -1563,8 +1563,8 @@ def aba_inserir_modalidade(tab):
             cod = int(ent_cod.get())
             desc = ent_desc.get()
             codProf = int(ent_codProf.get())
-            valor = ent_valor.get()
-            lima = float(ent_lima.get())
+            valor = int(ent_valor.get())
+            lima = int(ent_lima.get())
 
 
 
@@ -1605,7 +1605,7 @@ def aba_inserir_matricula(tab):
     def salvar_mat():
         try:
             cod = int(ent_cod.get())
-            codAlu = ent_codAlu.get()
+            codAlu = int(ent_codAlu.get())
             codModa = int(ent_codModa.get())
             qtdaulas = ent_qtdaulas.get()
 
