@@ -115,14 +115,14 @@ class Aluno:
         else:
             diagnostico = "Obesidade"
         return imc, diagnostico
-
 class Professor:
-    def __init__(self, cod, nome, endereco, telefone, codCidade):
+    def __init__(self, cod, nome, codCidade,endereco, telefone):
         self.cod = cod
         self.nome = nome
+        self.codCidade = codCidade
         self.endereco = endereco
         self.telefone = telefone
-        self.codCidade = codCidade
+
 class Modalidade:
     def __init__(self,codModalidade, descricao, codProfessor, valor, limiteAlunos, totalAlunos):
         self.cod = codModalidade
@@ -306,58 +306,78 @@ def carregarIndiceAlunos():
     except FileNotFoundError:
         open("dados/alunos.txt", "w", encoding="utf-8").close()
 
-def inserirAluno():
-    while True:
-        try:
-            cod = int(input("Digite o codigo do aluno (0 cancela): "))
-        except:
-            print("Apenas valor inteiro!")
-            continue
+def inserirAluno(cod, nome, codigoCidade, dataNascimento, peso, altura, output=None):
+    try:
 
-        if cod == 0:
-            print("Operação cancelada.")
-            return
         if arvoreAlunos.buscar(cod) is not None:
-            print("Codigo de aluno já existe!")
-            continue
-
-        nome = input("Digite o nome do aluno: ")
-
-        while True:
-            try:
-                codigoCidade = int(input("Código da Cidade: "))
-            except:
-                print("Apenas valor inteiro!")
-                continue
-
-            if arvoreCidades.buscar(codigoCidade) is not None:
-                break
+            msg = f"Código de aluno {cod} já existe!"
+            if output:
+                output.insert("end", msg + "\n")
             else:
-                print("Código de cidade não encontrado")
-                continue
+                print(msg)
+            return False
 
-        dataNascimento = input("Data de Nascimento: ")
-        while True:
-            try:
-                peso = float(input("Digite o peso do aluno(kg): "))
-                altura = float(input("Digite o altura do aluno (m): "))
-                break
-            except:
-                print('peso e altura devem ser valor reais!')
-                continue
+
+        if arvoreCidades.buscar(codigoCidade) is None:
+            msg = f"Código de cidade {codigoCidade} não encontrado!"
+            if output:
+                output.insert("end", msg + "\n")
+            else:
+                print(msg)
+            return False
+
 
         aluno = Aluno(cod, nome, codigoCidade, dataNascimento, peso, altura)
 
+
         linha = f"{aluno.cod};{aluno.nome};{aluno.codCidade};{aluno.dataNascimento};{aluno.peso};{aluno.altura}\n"
 
-        arquivo = open("dados/alunos.txt", "a", encoding="utf-8")
-        posicao = arquivo.tell()
-        arquivo.write(linha)
-        arvoreAlunos.inserir(cod, posicao)
-        arquivo.close()
 
-        print("Aluno salvo com sucesso!")
-        break
+        with open("dados/alunos.txt", "a", encoding="utf-8") as arquivo:
+            posicao = arquivo.tell()
+            arquivo.write(linha)
+            arvoreAlunos.inserir(cod, posicao)
+
+
+        nomeCidade, estado = "Desconhecida", "??"
+        with open("dados/cidades.txt", "r", encoding="utf-8") as cidades:
+            for linha_cidade in cidades:
+                partes = linha_cidade.strip().split(";")
+                if len(partes) >= 3 and int(partes[0]) == codigoCidade:
+                    nomeCidade, estado = partes[1], partes[2]
+                    break
+
+
+        imc = peso / (altura ** 2)
+        if imc < 18.5:
+            diagnostico = "Abaixo do peso"
+        elif imc < 25:
+            diagnostico = "Peso normal"
+        elif imc < 30:
+            diagnostico = "Sobrepeso"
+        else:
+            diagnostico = "Obesidade"
+
+        msg = (
+            f"Aluno {nome} salvo com sucesso!\n"
+            f"IMC: {imc:.2f} ({diagnostico})\n"
+            f"Cidade: {nomeCidade} - {estado}"
+        )
+
+        if output:
+            output.insert("end", msg + "\n\n")
+        else:
+            print(msg)
+
+        return True
+
+    except Exception as e:
+        msg = f"Erro ao inserir aluno: {e}"
+        if output:
+            output.insert("end", msg + "\n")
+        else:
+            print(msg)
+        return False
 
 def buscarAluno():
     try:
@@ -517,52 +537,62 @@ def carregarIndiceProfessor():
     except FileNotFoundError:
         open("dados/professor.txt", "w", encoding="utf-8").close()
 
-def inserirProfessor():
-    while True:
-        try:
-            cod = int(input("Digite o codigo do Professor (0 cancela): "))
-        except:
-            print("Apenas valor inteiro!")
-            continue
+def inserirProfessor(cod, nome, codCidade, endereco, telefone, output=None):
+    try:
 
-        if cod == 0:
-            print("Operação cancelada.")
-            return
         if arvoreProfessores.buscar(cod) is not None:
-            print("Codigo de professor já existe!")
-            continue
-
-        nome = input("Digite o nome do professor: ")
-
-        while True:
-            try:
-                codCidade = int(input("Código da Cidade: "))
-            except:
-                print("Apenas valor inteiro!")
-                continue
-
-            if arvoreCidades.buscar(codCidade) is not None:
-                break
+            msg = f"Código de professor {cod} já existe!"
+            if output:
+                output.insert("end", msg + "\n")
             else:
-                print("Código de cidade não encontrado")
-                continue
-
-        endereco = input("Endereço do professor: ")
-        telefone = input("Telefone: ")
+                print(msg)
+            return False
 
 
-        professor = Professor(cod, nome, endereco, telefone, codCidade)
+        if arvoreCidades.buscar(codCidade) is None:
+            msg = f"Código de cidade {codCidade} não encontrado!"
+            if output:
+                output.insert("end", msg + "\n")
+            else:
+                print(msg)
+            return False
 
-        linha = f"{professor.cod};{professor.nome};{professor.endereco};{professor.telefone};{professor.codCidade}\n"
 
-        arquivo = open("dados/professor.txt", "a", encoding="utf-8")
-        posicao = arquivo.tell()
-        arquivo.write(linha)
-        arvoreProfessores.inserir(cod, posicao)
-        arquivo.close()
+        professor = Professor(cod, nome, codCidade, endereco, telefone)
 
-        print("Professor salvo com sucesso!")
-        break
+
+        linha = f"{professor.cod};{professor.nome};{professor.codCidade};{professor.endereco};{professor.telefone}\n"
+
+
+        with open("dados/professor.txt", "a", encoding="utf-8") as arquivo:
+            posicao = arquivo.tell()
+            arquivo.write(linha)
+            arvoreProfessores.inserir(cod, posicao)
+
+        nomeCidade, estado = "Desconhecida", "??"
+        with open("dados/cidades.txt", "r", encoding="utf-8") as cidades:
+            for linha_cidade in cidades:
+                partes = linha_cidade.strip().split(";")
+                if len(partes) >= 3 and int(partes[0]) == codCidade:
+                    nomeCidade, estado = partes[1], partes[2]
+                    break
+
+        msg = ( f"Professor {nome} salvo com sucesso!\n"
+                f"Cidade: {nomeCidade} - {estado}")
+        if output:
+            output.insert("end", msg + "\n")
+        else:
+            print(msg)
+
+        return True
+
+    except Exception as e:
+        msg = f"Erro ao inserir professor: {e}"
+        if output:
+            output.insert("end", msg + "\n")
+        else:
+            print(msg)
+        return False
 
 def buscarProfessor():
     try:
@@ -713,7 +743,6 @@ def carregarIndiceModalidades():
                 continue
     except FileNotFoundError:
         open("dados/modalidades.txt", "w", encoding="utf-8").close()
-
 
 def inserirModalidade():
     while True:
@@ -948,7 +977,6 @@ def carregarIndiceMatriculas():
                 continue
     except FileNotFoundError:
         open("dados/matriculas.txt", "w", encoding="utf-8").close()
-
 
 def inserirMatricula():
     while True:
@@ -1347,95 +1375,6 @@ def totalFaturado():
 
 
 
-#---------------------------MENU---------------------------------------#
-def menu():
-    while True:
-        print("\n--- MENU ---")
-        print("1 - Inserir")
-        print("2 - Buscar")
-        print("3 - Deletar")
-        print("4- Total Faturado")
-        print("5- Leitura Exaustiva")
-        print("0 - Sair")
-        opcao = input("Escolha: ")
-#---------------INSERIR---------------------------#
-        if opcao == "1":
-            opcao= input("1- Inserir Aluno \n"
-                         "2- Inserir Cidade \n"
-                         "3- Inserir Matricula \n"
-                         "4- Inserir Modalidade \n"
-                         "5- Inserir Professores\n Escolha: ")
-            if(opcao == "1"):
-                inserirAluno()
-            elif (opcao == "2"):
-                inserirCidade()
-            elif (opcao == "3"):
-                inserirMatricula()
-            elif (opcao == "4"):
-                inserirModalidade()
-            elif (opcao == "5"):
-                inserirProfessor()
-#----------------BUSCAR----------------------#
-        elif opcao == "2":
-            opcao = input("1- Buscar Aluno \n"
-                          "2- Buscar Cidade \n"
-                          "3- Buscar Matricula \n"
-                          "4- Buscar Modalidade \n"
-                          "5- Buscar Professores\n Escolha: ")
-            if(opcao == "1"):
-                buscarAluno()
-            elif (opcao == "2"):
-                buscarCidade()
-            elif (opcao == "3"):
-                buscarMatricula()
-            elif (opcao =="4"):
-                buscarModalidade()
-            elif (opcao == "5"):
-                buscarProfessor()
-# ----------------DELETAR----------------------#
-        elif opcao == "3":
-            opcao = input("1- Deletar Aluno \n"
-                          "2- Deletar Cidade \n"
-                          "3- Deletar Matricula \n"
-                          "4- Deletar Modalidade \n"
-                          "5- Deletar Professores\n Escolha: ")
-            if(opcao == "1"):
-                excluirAluno()
-            elif (opcao == "2"):
-                excluirCidade()
-            elif (opcao == "3"):
-                excluirMatricula()
-            elif (opcao == "4"):
-                excluirModalidade()
-            elif (opcao == "5"):
-                excluirProfessor()
-#--------------Valor faturado-------------#
-        elif opcao == "4":
-            totalFaturado()
-#-------------Leitura exaustiva----------#
-        elif opcao == "5":
-            opcao = input("1- Leitura Exaustiva Aluno \n"
-                          "2- Leitura Exaustiva Cidade \n"
-                          "3- Leitura Exaustiva Matricula \n"
-                          "4- Leitura Exaustiva Modalidade \n"
-                          "5- Leitura Exaustiva Professores\n Escolha: ")
-            if(opcao == "1"):
-                leituraExaustivaAluno()
-            elif(opcao == "2"):
-                leituraExaustivaCidade()
-            elif(opcao == "3"):
-                leituraExaustivaMatricula()
-            elif(opcao =="4"):
-                leituraExaustivaModalidade()
-            elif(opcao == "5"):
-                leituraExaustivaProfessor()
-
-#-----------------SAIR---------------------#
-        elif opcao == "0":
-            print("Programa encerrado!")
-            break
-        else:
-            continue
 
 if not os.path.exists("dados"):
     os.mkdir("dados")
@@ -1506,19 +1445,60 @@ def aba_inserir_alunos(tab):
             peso = float(ent_peso.get())
             altura = float(ent_altura.get())
 
-            # grava direto no arquivo + árvore
-            aluno = Aluno(cod, nome, codCidade, nasc, peso, altura)
-            linha = f"{aluno.cod};{aluno.nome};{aluno.codCidade};{aluno.dataNascimento};{aluno.peso};{aluno.altura}\n"
-            with open("dados/alunos.txt", "a", encoding="utf-8") as f:
-                posicao = f.tell()
-                f.write(linha)
-                arvoreAlunos.inserir(cod, posicao)
-
-            output.insert("end", f"Aluno {nome} salvo com sucesso!\n")
+            inserirAluno(cod, nome, codCidade, nasc, peso, altura, output)
         except Exception as e:
             output.insert("end", f"Erro: {e}\n")
 
     btn_salvar = ctk.CTkButton(tab, text="Salvar Aluno", command=salvar_aluno)
+    btn_salvar.grid(row=6, column=0, columnspan=2, pady=10)
+
+def aba_inserir_professores(tab):
+    # Labels e entradas
+    lbl_cod = ctk.CTkLabel(tab, text="Código:")
+    lbl_cod.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+    ent_cod = ctk.CTkEntry(tab)
+    ent_cod.grid(row=0, column=1, padx=10, pady=5)
+
+    lbl_nome = ctk.CTkLabel(tab, text="Nome:")
+    lbl_nome.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+    ent_nome = ctk.CTkEntry(tab)
+    ent_nome.grid(row=1, column=1, padx=10, pady=5)
+
+    lbl_endereco = ctk.CTkLabel(tab, text="Endereço:")
+    lbl_endereco.grid(row=2, column=0, padx=10, pady=5, sticky="w")
+    ent_endereco = ctk.CTkEntry(tab)
+    ent_endereco.grid(row=2, column=1, padx=10, pady=5)
+
+    lbl_tel = ctk.CTkLabel(tab, text="Telefone:")
+    lbl_tel.grid(row=3, column=0, padx=10, pady=5, sticky="w")
+    ent_tel = ctk.CTkEntry(tab)
+    ent_tel.grid(row=3, column=1, padx=10, pady=5)
+
+    lbl_codCi = ctk.CTkLabel(tab, text="Codigo da cidade:")
+    lbl_codCi.grid(row=4, column=0, padx=10, pady=5, sticky="w")
+    ent_codCi = ctk.CTkEntry(tab)
+    ent_codCi.grid(row=4, column=1, padx=10, pady=5)
+
+
+    # Área de mensagens
+    output = ctk.CTkTextbox(tab, height=150, width=400)
+    output.grid(row=7, column=0, columnspan=2, padx=10, pady=10)
+
+    def salvar_prof():
+        try:
+            cod = int(ent_cod.get())
+            nome = ent_nome.get()
+            codCidade = int(ent_codCi.get())
+            endereco = ent_endereco.get()
+            telefone = float(ent_tel.get())
+
+
+
+            inserirProfessor(cod, nome, codCidade, endereco, telefone, output)
+        except Exception as e:
+            output.insert("end", f"Erro: {e}\n")
+
+    btn_salvar = ctk.CTkButton(tab, text="Salvar Professor", command=salvar_prof)
     btn_salvar.grid(row=6, column=0, columnspan=2, pady=10)
 
 #novas telas
@@ -1552,11 +1532,7 @@ def tela_inserir():
     tabview.tab("Cidade").grid_columnconfigure(0, weight=1)
 
     aba_inserir_alunos(tabview.tab("Alunos"))
-    # caixas de textos e infos da navbar
-
-    # aluno
-
-
+    aba_inserir_professores(tabview.tab("Professores"))
 
 def tela_buscar():
     app.withdraw()
@@ -1586,7 +1562,6 @@ def tela_buscar():
     tabview.tab("Modalidade").grid_columnconfigure(0, weight=1)
     tabview.tab("Cidade").grid_columnconfigure(0, weight=1)
 
-
 def tela_deletar():
     app.withdraw()
     tela_deletar= ctk.CTkToplevel(app)
@@ -1614,7 +1589,6 @@ def tela_deletar():
     tabview.tab("Matricula").grid_columnconfigure(0, weight=1)
     tabview.tab("Modalidade").grid_columnconfigure(0, weight=1)
     tabview.tab("Cidade").grid_columnconfigure(0, weight=1)
-
 
 def tela_totalFaturado():
     app.withdraw()
