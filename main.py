@@ -722,8 +722,6 @@ def leituraExaustivaProfessor():
     arquivo.close()
     arquivoCidade.close()
 
-
-
 #-----------------------MODALIDADES_____________________________________#
 def carregarIndiceModalidades():
     try:
@@ -744,75 +742,80 @@ def carregarIndiceModalidades():
     except FileNotFoundError:
         open("dados/modalidades.txt", "w", encoding="utf-8").close()
 
-def inserirModalidade():
-    while True:
-        try:
-            cod = int(input("Digite o código da modalidade (0 cancela): "))
-        except:
-            print("Apenas valor inteiro!")
-            continue
+def inserirModalidade(cod, descricao, codProf, valor, limite, output=None):
+    try:
 
-        if cod == 0:
-            print("Operação cancelada.")
-            return
         if arvoreModalidades.buscar(cod) is not None:
-            print("Código de modalidade já existe!")
-            continue
-
-        descricao = input("Descrição da Modalidade: ")
-
-        while True:
-            try:
-                codProfessor = int(input("Código do professor: "))
-            except:
-                print("Apenas valor inteiro!")
-                continue
-
-            posProfessor = arvoreProfessores.buscar(codProfessor)
-            if posProfessor is not None:
-                arquivoProf = open("dados/professor.txt", "r", encoding="utf-8")
-                arquivoProf.seek(posProfessor)
-                linhaProf = arquivoProf.readline().strip().split(";")
-                nomeProfessor = linhaProf[1]
-                cidadeProfessor = linhaProf[2]
-                arquivoProf.close()
-                break
+            msg = f"Código de modalidade {cod} já existe!"
+            if output:
+                output.insert("end", msg + "\n")
             else:
-                print("Código de professor não encontrado")
+                print(msg)
+            return False
 
-        while True:
-            try:
-                valor = input("Valor da aula: ")
-                valor = float(valor.replace(",", "."))
-                break
-            except:
-                print("Apenas valor real!")
+        if arvoreProfessores.buscar(codProf) is None:
+            msg = f"Código de professor {codProf} não encontrado!"
+            if output:
+                output.insert("end", msg + "\n")
+            else:
+                print(msg)
+            return False
 
-        while True:
-            try:
-                limiteAlunos = int(input("Limite de alunos: "))
-                break
-            except:
-                print("Apenas valor inteiro!")
 
-        modalidade = Modalidade(cod, descricao, codProfessor, valor, limiteAlunos, 0)
+        professor_nome = "Desconhecido"
+        professor_codCidade = None
+        with open("dados/professor.txt", "r", encoding="utf-8") as arq_prof:
+            for linha_prof in arq_prof:
+                partes = linha_prof.strip().split(";")
+                if len(partes) >= 5 and int(partes[0]) == codProf:
+                    professor_nome = partes[1]
+                    professor_codCidade = int(partes[2])
+                    break
 
-        arquivo = open("dados/modalidades.txt", "a", encoding="utf-8")
-        posicao = arquivo.tell()
-        linha = f"{modalidade.cod};{modalidade.descricao};{modalidade.codProfessor};{modalidade.valor};{modalidade.limiteAlunos};{modalidade.totalAlunos}\n"
-        arquivo.write(linha)
-        arquivo.close()
 
-        arvoreModalidades.inserir(cod, posicao)
+        nomeCidade, estado = "Desconhecida", "??"
+        if professor_codCidade is not None:
+            with open("dados/cidades.txt", "r", encoding="utf-8") as arq_cidades:
+                for linha_cidade in arq_cidades:
+                    partes = linha_cidade.strip().split(";")
+                    if len(partes) >= 3 and int(partes[0]) == professor_codCidade:
+                        nomeCidade, estado = partes[1], partes[2]
+                        break
 
-        print("Modalidade cadastrada com sucesso!")
-        print("Descricao: ",modalidade.descricao)
-        print("Professor: ", nomeProfessor)
-        print("Cidade do professor: ", cidadeProfessor)
-        print(f"Valor da aula: R$ {modalidade.valor:.2f}")
-        print("Limite de alunos: ", modalidade.limiteAlunos)
-        print("Total de alunos: ", modalidade.totalAlunos)
-        break
+
+        total_alunos = 0
+
+
+        linha = f"{cod};{descricao};{codProf};{valor};{limite};{total_alunos}\n"
+
+
+        with open("dados/modalidade.txt", "a", encoding="utf-8") as arquivo:
+            posicao = arquivo.tell()
+            arquivo.write(linha)
+            arvoreModalidades.inserir(cod, posicao)
+
+
+        msg = (
+            f"Modalidade '{descricao}' salva com sucesso!\n"
+            f"Professor: {professor_nome}\n"
+            f"Cidade do professor: {nomeCidade} - {estado}\n"
+            f"Total de alunos: {total_alunos}"
+        )
+
+        if output:
+            output.insert("end", msg + "\n\n")
+        else:
+            print(msg)
+
+        return True
+
+    except Exception as e:
+        msg = f"Erro ao inserir modalidade: {e}"
+        if output:
+            output.insert("end", msg + "\n")
+        else:
+            print(msg)
+        return False
 
 def buscarModalidade():
     while True:
@@ -978,93 +981,119 @@ def carregarIndiceMatriculas():
     except FileNotFoundError:
         open("dados/matriculas.txt", "w", encoding="utf-8").close()
 
-def inserirMatricula():
-    while True:
-        try:
-            cod = int(input("Código da matrícula (0 cancela): "))
-        except:
-            print("Apenas valor inteiro!")
-            continue
-
-        if cod == 0:
-            print("Operação cancelada.")
-            return
+def inserirMatricula(cod, codAluno, codModalidade, qtdaulas, output=None):
+    try:
 
         if arvoreMatriculas.buscar(cod) is not None:
-            print("Código de matrícula já existe!")
-            continue
-
-        while True:
-            try:
-                codAluno = int(input("Código do Aluno: "))
-            except:
-                print("Apenas valor inteiro!")
-                continue
-
-            posAluno = arvoreAlunos.buscar(codAluno)
-            if posAluno is not None:
-                arquivoAluno = open("dados/alunos.txt", "r", encoding="utf-8")
-                arquivoAluno.seek(posAluno)
-                linha = arquivoAluno.readline().strip().split(";")
-                nomeAluno = linha[1]
-                cidadeAluno = linha[2]
-                arquivoAluno.close()
-                break
+            msg = f"Código de matrícula {cod} já existe!"
+            if output:
+                output.insert("end", msg + "\n")
             else:
-                print("Aluno não encontrado.")
+                print(msg)
+            return False
 
-        while True:
-            try:
-                codModalidade = int(input("Código da Modalidade: "))
-            except:
-                print("Apenas valor inteiro!")
-                continue
 
-            posModalidade = arvoreModalidades.buscar(codModalidade)
-            if posModalidade is not None:
-                arquivoMod = open("dados/modalidades.txt", "r+", encoding="utf-8")
-                arquivoMod.seek(posModalidade)
-                itens = arquivoMod.readline().strip().split(";")
-                descricaoModalidade = itens[1]
-                valorDaAula = float(itens[3])
-                limiteAlunos = int(itens[4])
-                totalAlunos = int(itens[5])
-
-                if totalAlunos >= limiteAlunos:
-                    print(f"Limite de {limiteAlunos} alunos atingido.")
-                    arquivoMod.close()
-                    return
-
-                totalAlunos += 1
-                arquivoMod.seek(posModalidade)
-                arquivoMod.write(f"{itens[0]};{itens[1]};{itens[2]};{itens[3]};{itens[4]};{totalAlunos}\n")
-                arquivoMod.close()
-                break
+        aluno_nome, aluno_codCidade = None, None
+        with open("dados/alunos.txt", "r", encoding="utf-8") as arq_alunos:
+            for linha_aluno in arq_alunos:
+                partes = linha_aluno.strip().split(";")
+                if len(partes) >= 6 and int(partes[0]) == int(codAluno):
+                    aluno_nome = partes[1]
+                    aluno_codCidade = int(partes[2])
+                    break
+        if aluno_nome is None:
+            msg = f"Aluno {codAluno} não encontrado!"
+            if output:
+                output.insert("end", msg + "\n")
             else:
-                print("Modalidade não encontrada.")
+                print(msg)
+            return False
 
-        while True:
-            try:
-                qtdeAulas = int(input("Quantidade de aulas: "))
+
+        nomeCidade, estado = "Desconhecida", "??"
+        with open("dados/cidades.txt", "r", encoding="utf-8") as arq_cidades:
+            for linha_cidade in arq_cidades:
+                partes = linha_cidade.strip().split(";")
+                if len(partes) >= 3 and int(partes[0]) == aluno_codCidade:
+                    nomeCidade, estado = partes[1], partes[2]
+                    break
+
+
+        desc, valor, limite, total_alunos = None, None, None, None
+        linhas_modalidade = []
+        with open("dados/modalidade.txt", "r", encoding="utf-8") as arq_mod:
+            linhas_modalidade = arq_mod.readlines()
+
+        for linha_mod in linhas_modalidade:
+            partes = linha_mod.strip().split(";")
+            if len(partes) >= 6 and int(partes[0]) == codModalidade:
+                desc = partes[1]
+                valor = float(partes[3])
+                limite = int(partes[4])
+                total_alunos = int(partes[5])
                 break
-            except:
-                print("Apenas valor inteiro!")
 
-        matricula = Matricula(cod, codAluno, codModalidade, qtdeAulas)
-        arquivo = open("dados/matriculas.txt", "a", encoding="utf-8")
-        posicao = arquivo.tell()
-        linha = f"{matricula.cod};{matricula.codAluno};{matricula.codModalidade};{matricula.qtdeAulas}\n"
-        arquivo.write(linha)
-        arquivo.close()
-        arvoreMatriculas.inserir(matricula.cod, posicao)
+        if desc is None:
+            msg = f"Modalidade {codModalidade} não encontrada!"
+            if output:
+                output.insert("end", msg + "\n")
+            else:
+                print(msg)
+            return False
 
-        print("\nMatrícula cadastrada com sucesso!")
-        print("Aluno: ", nomeAluno)
-        print("Cidade do aluno: ", cidadeAluno)
-        print("Modalidade: ",descricaoModalidade)
-        print("Quantidade de aulas", qtdeAulas)
-        print(f"Valor a pagar: R$ {valorDaAula * qtdeAulas:.2f}\n")
-        break
+
+        if total_alunos >= limite:
+            msg = f"Modalidade {desc} atingiu o limite de alunos ({limite})!"
+            if output:
+                output.insert("end", msg + "\n")
+            else:
+                print(msg)
+            return False
+
+
+        valor_total = valor * float(qtdaulas)
+
+
+        linha = f"{cod};{codAluno};{codModalidade};{qtdaulas}\n"
+        with open("dados/matriculas.txt", "a", encoding="utf-8") as arq_mat:
+            posicao = arq_mat.tell()
+            arq_mat.write(linha)
+            arvoreMatriculas.inserir(cod, posicao)
+
+
+        with open("dados/modalidade.txt", "w", encoding="utf-8") as arq_mod:
+            for linha_mod in linhas_modalidade:
+                partes = linha_mod.strip().split(";")
+                if int(partes[0]) == codModalidade:
+                    partes[5] = str(total_alunos + 1)
+                    linha_mod = ";".join(partes) + "\n"
+                arq_mod.write(linha_mod)
+
+
+        msg = (
+            f"Matrícula salva com sucesso!\n"
+            f"Aluno: {aluno_nome} - {nomeCidade} - {estado}\n"
+            f"Modalidade: {desc}\n"
+            f"Quantidade de aulas: {qtdaulas}\n"
+            f"Valor a pagar: R$ {valor_total:.2f}\n"
+            f"Total de alunos na modalidade agora: {total_alunos + 1}"
+        )
+
+        if output:
+            output.insert("end", msg + "\n\n")
+        else:
+            print(msg)
+
+        return True
+
+    except Exception as e:
+        msg = f"Erro ao inserir matrícula: {e}"
+        if output:
+            output.insert("end", msg + "\n")
+        else:
+            print(msg)
+        return False
+
 
 def buscarMatricula():
     try:
@@ -1372,10 +1401,6 @@ def totalFaturado():
     print(f"Valor faturado: R${valorFaturado:.2f}")
 
 
-
-
-
-
 if not os.path.exists("dados"):
     os.mkdir("dados")
 
@@ -1501,6 +1526,96 @@ def aba_inserir_professores(tab):
     btn_salvar = ctk.CTkButton(tab, text="Salvar Professor", command=salvar_prof)
     btn_salvar.grid(row=6, column=0, columnspan=2, pady=10)
 
+def aba_inserir_modalidade(tab):
+    # Labels e entradas
+    lbl_cod = ctk.CTkLabel(tab, text="Código:")
+    lbl_cod.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+    ent_cod = ctk.CTkEntry(tab)
+    ent_cod.grid(row=0, column=1, padx=10, pady=5)
+
+    lbl_desc = ctk.CTkLabel(tab, text="Descrição:")
+    lbl_desc.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+    ent_desc = ctk.CTkEntry(tab)
+    ent_desc.grid(row=1, column=1, padx=10, pady=5)
+
+    lbl_codProf = ctk.CTkLabel(tab, text="Código Do Professor:")
+    lbl_codProf.grid(row=2, column=0, padx=10, pady=5, sticky="w")
+    ent_codProf = ctk.CTkEntry(tab)
+    ent_codProf.grid(row=2, column=1, padx=10, pady=5)
+
+    lbl_valor = ctk.CTkLabel(tab, text="Valor:")
+    lbl_valor.grid(row=3, column=0, padx=10, pady=5, sticky="w")
+    ent_valor = ctk.CTkEntry(tab)
+    ent_valor.grid(row=3, column=1, padx=10, pady=5)
+
+    lbl_lima = ctk.CTkLabel(tab, text="Limite de alunos:")
+    lbl_lima.grid(row=4, column=0, padx=10, pady=5, sticky="w")
+    ent_lima = ctk.CTkEntry(tab)
+    ent_lima.grid(row=4, column=1, padx=10, pady=5)
+
+
+    # Área de mensagens
+    output = ctk.CTkTextbox(tab, height=150, width=400)
+    output.grid(row=7, column=0, columnspan=2, padx=10, pady=10)
+
+    def salvar_moda():
+        try:
+            cod = int(ent_cod.get())
+            desc = ent_desc.get()
+            codProf = int(ent_codProf.get())
+            valor = ent_valor.get()
+            lima = float(ent_lima.get())
+
+
+
+            inserirModalidade(cod, desc, codProf, valor, lima, output)
+        except Exception as e:
+            output.insert("end", f"Erro: {e}\n")
+
+    btn_salvar = ctk.CTkButton(tab, text="Salvar Modalidade", command=salvar_moda)
+    btn_salvar.grid(row=6, column=0, columnspan=2, pady=10)
+
+def aba_inserir_matricula(tab):
+    # Labels e entradas
+    lbl_cod = ctk.CTkLabel(tab, text="Código:")
+    lbl_cod.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+    ent_cod = ctk.CTkEntry(tab)
+    ent_cod.grid(row=0, column=1, padx=10, pady=5)
+
+    lbl_codAlu = ctk.CTkLabel(tab, text="Código Do Aluno:")
+    lbl_codAlu.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+    ent_codAlu = ctk.CTkEntry(tab)
+    ent_codAlu.grid(row=1, column=1, padx=10, pady=5)
+
+    lbl_codModa = ctk.CTkLabel(tab, text="Código Da Modalidade:")
+    lbl_codModa.grid(row=2, column=0, padx=10, pady=5, sticky="w")
+    ent_codModa = ctk.CTkEntry(tab)
+    ent_codModa.grid(row=2, column=1, padx=10, pady=5)
+
+    lbl_qtdaulas = ctk.CTkLabel(tab, text="Quantidade de Aulas:")
+    lbl_qtdaulas.grid(row=3, column=0, padx=10, pady=5, sticky="w")
+    ent_qtdaulas = ctk.CTkEntry(tab)
+    ent_qtdaulas.grid(row=3, column=1, padx=10, pady=5)
+
+
+    # Área de mensagens
+    output = ctk.CTkTextbox(tab, height=150, width=400)
+    output.grid(row=7, column=0, columnspan=2, padx=10, pady=10)
+
+    def salvar_mat():
+        try:
+            cod = int(ent_cod.get())
+            codAlu = ent_codAlu.get()
+            codModa = int(ent_codModa.get())
+            qtdaulas = ent_qtdaulas.get()
+
+            inserirMatricula(cod, codAlu, codModa, qtdaulas, output)
+        except Exception as e:
+            output.insert("end", f"Erro: {e}\n")
+
+    btn_salvar = ctk.CTkButton(tab, text="Salvar Matricula", command=salvar_mat)
+    btn_salvar.grid(row=6, column=0, columnspan=2, pady=10)
+
 #novas telas
 
 def tela_inserir():
@@ -1533,6 +1648,8 @@ def tela_inserir():
 
     aba_inserir_alunos(tabview.tab("Alunos"))
     aba_inserir_professores(tabview.tab("Professores"))
+    aba_inserir_modalidade(tabview.tab("Modalidade"))
+    aba_inserir_matricula(tabview.tab("Matricula"))
 
 def tela_buscar():
     app.withdraw()
@@ -1617,8 +1734,6 @@ def tela_leituraExaustiva():
         app.deiconify()
 
     tela_leituraExaustiva.protocol("WM_DELETE_WINDOW", fechar_tela_leituraExaustiva)
-
-
 
 
 #Menu Principal
