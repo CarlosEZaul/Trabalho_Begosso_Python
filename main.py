@@ -158,36 +158,48 @@ def carregarIndiceCidades():
     except FileNotFoundError:
         open("dados/cidades.txt", "w", encoding="utf-8").close()
 
-def inserirCidade():
-    while True:
-        try:
-            cod = int(input("Digite o codigo da cidade (0 cancela): "))
-        except:
-            print("Apenas valor inteiro!")
-            continue
-
-        if cod == 0:
-            print("Operação cancelada.")
-            break
+def inserirCidade(cod, descCi, estado,  output=None):
+    try:
 
         if arvoreCidades.buscar(cod) is not None:
-            print("Codigo de cidade já existe!")
-            continue
+            msg = f"Código de cidade {cod} já existe!"
+            if output:
+                output.insert("end", msg + "\n")
+            else:
+                print(msg)
+            return False
 
-        descricao = input("Digite a descricao da cidade: ")
-        estado = input("Digite o estado da cidade: ")
 
-        cidade = Cidade(cod, descricao, estado)
+
+        cidade = Cidade(cod, descCi, estado)
+
 
         linha = f"{cidade.cod};{cidade.descricao};{cidade.estado}\n"
 
-        arquivo = open("dados/cidades.txt", "a", encoding="utf-8")
-        posicao = arquivo.tell()
-        arquivo.write(linha)
-        arvoreCidades.inserir(cod, posicao)
 
-        print("Cidade salva com sucesso!")
-        break
+        with open("dados/cidades.txt", "a", encoding="utf-8") as arquivo:
+            posicao = arquivo.tell()
+            arquivo.write(linha)
+            arvoreCidades.inserir(cod, posicao)
+
+        msg = (
+            f"Cidade {descCi} salva com sucesso!\n"
+        )
+
+        if output:
+            output.insert("end", msg + "\n\n")
+        else:
+            print(msg)
+
+        return True
+
+    except Exception as e:
+        msg = f"Erro ao inserir cidade: {e}"
+        if output:
+            output.insert("end", msg + "\n")
+        else:
+            print(msg)
+        return False
 
 def buscarCidade():
     try:
@@ -281,8 +293,6 @@ def leituraExaustivaCidade():
             print("Estado: ", cidade.estado)
             print("=========================")
     arquivo.close()
-
-
 
 #------------------------------------------------------------------#
 
@@ -1616,6 +1626,41 @@ def aba_inserir_matricula(tab):
     btn_salvar = ctk.CTkButton(tab, text="Salvar Matricula", command=salvar_mat)
     btn_salvar.grid(row=6, column=0, columnspan=2, pady=10)
 
+def aba_inserir_cidade(tab):
+    # Labels e entradas
+    lbl_cod = ctk.CTkLabel(tab, text="Código:")
+    lbl_cod.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+    ent_cod = ctk.CTkEntry(tab)
+    ent_cod.grid(row=0, column=1, padx=10, pady=5)
+
+    lbl_descCi = ctk.CTkLabel(tab, text="Descrição/Nome da Cidade:")
+    lbl_descCi.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+    ent_descCi = ctk.CTkEntry(tab)
+    ent_descCi.grid(row=1, column=1, padx=10, pady=5)
+
+    lbl_estado = ctk.CTkLabel(tab, text="Estado:")
+    lbl_estado.grid(row=2, column=0, padx=10, pady=5, sticky="w")
+    ent_estado = ctk.CTkEntry(tab)
+    ent_estado.grid(row=2, column=1, padx=10, pady=5)
+
+
+    # Área de mensagens
+    output = ctk.CTkTextbox(tab, height=150, width=400)
+    output.grid(row=7, column=0, columnspan=2, padx=10, pady=10)
+
+    def salvar_cid():
+        try:
+            cod = int(ent_cod.get())
+            descCi = ent_descCi.get()
+            estado = ent_estado.get()
+
+            inserirCidade(cod, descCi, estado, output)
+        except Exception as e:
+            output.insert("end", f"Erro: {e}\n")
+
+    btn_salvar = ctk.CTkButton(tab, text="Salvar Cidade", command=salvar_cid)
+    btn_salvar.grid(row=6, column=0, columnspan=2, pady=10)
+
 #novas telas
 
 def tela_inserir():
@@ -1650,6 +1695,7 @@ def tela_inserir():
     aba_inserir_professores(tabview.tab("Professores"))
     aba_inserir_modalidade(tabview.tab("Modalidade"))
     aba_inserir_matricula(tabview.tab("Matricula"))
+    aba_inserir_cidade(tabview.tab("Cidade"))
 
 def tela_buscar():
     app.withdraw()
