@@ -1781,6 +1781,20 @@ def tela_leituraExaustiva():
 
     tela_leituraExaustiva.protocol("WM_DELETE_WINDOW", fechar_tela_leituraExaustiva)
 
+    # Seleção de quem vai ser
+    tabview = ctk.CTkTabview(tela_leituraExaustiva, height=1080, width=720, corner_radius=20)
+    tabview.pack(fill="both")
+    tabview.add("Alunos")
+    tabview.add("Professores")
+    tabview.add("Matricula")
+    tabview.add("Modalidade")
+    tabview.add("Cidade")
+    tabview.tab("Alunos").grid_columnconfigure(0, weight=1)
+    tabview.tab("Professores").grid_columnconfigure(0, weight=1)
+    tabview.tab("Matricula").grid_columnconfigure(0, weight=1)
+    tabview.tab("Modalidade").grid_columnconfigure(0, weight=1)
+    tabview.tab("Cidade").grid_columnconfigure(0, weight=1)
+
 
 #Menu Principal
 frameteste = ctk.CTkFrame(app, width=540, height=360, corner_radius=30).place(x=310, y=200)
