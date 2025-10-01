@@ -122,7 +122,6 @@ class Professor:
         self.codCidade = codCidade
         self.endereco = endereco
         self.telefone = telefone
-
 class Modalidade:
     def __init__(self,codModalidade, descricao, codProfessor, valor, limiteAlunos, totalAlunos):
         self.cod = codModalidade
@@ -853,7 +852,7 @@ def inserirModalidade(cod, descricao, codProf, valor, limite, output=None):
 
 def buscarModalidade(cod, output=None):
     try:
-        with open("dados/modalidade.txt", "r", encoding="utf-8") as arq:
+        with open("dados/modalidades.txt", "r", encoding="utf-8") as arq:
             for linha in arq:
                 partes = linha.strip().split(";")
                 if int(partes[0]) == cod:
@@ -1149,7 +1148,7 @@ def buscarMatricula(cod, output=None):
 
 
                     desc, valor = "?", 0
-                    with open("dados/modalidade.txt", "r", encoding="utf-8") as arq_mod:
+                    with open("dados/modalidades.txt", "r", encoding="utf-8") as arq_mod:
                         for l in arq_mod:
                             p = l.strip().split(";")
                             if int(p[0]) == codModalidade:
@@ -1437,10 +1436,11 @@ carregarIndiceMatriculas()
 
 #janela
 app = customtkinter.CTk()
-app.title("Trabalho Bagos - Menu")
+app.title("PowerOn - Menu")
 customtkinter.set_appearance_mode("dark")
 app.geometry("1080x720")
 app.resizable(width=False, height=False)
+app.iconbitmap("icon_poweron.ico")
 
 #inconify fecha a janela e deiconify reabre
 
@@ -1781,8 +1781,9 @@ def tela_inserir():
     app.withdraw()
     tela_inserir= ctk.CTkToplevel(app)
     tela_inserir.geometry("1080x720")
-    tela_inserir.title("Trabalho Bagos - Inserir")
+    tela_inserir.title("PowerOn - Inserir")
     tela_inserir.resizable(width=False, height=False)
+    tela_inserir.iconbitmap("icon_poweron.ico")
 
     # Restaura a janela principal
     def fechar_tela_inserir():
@@ -1815,8 +1816,9 @@ def tela_buscar():
     app.withdraw()
     tela_buscar= ctk.CTkToplevel(app)
     tela_buscar.geometry("1080x720")
-    tela_buscar.title("Trabalho Bagos - Buscar")
+    tela_buscar.title("PowerOn - Buscar")
     tela_buscar.resizable(width=False, height=False)
+    tela_buscar.iconbitmap("icon_poweron.ico")
 
     # Restaura a janela principal
     def fechar_tela_buscar():
@@ -1849,8 +1851,9 @@ def tela_deletar():
     app.withdraw()
     tela_deletar= ctk.CTkToplevel(app)
     tela_deletar.geometry("1080x720")
-    tela_deletar.title("Trabalho Bagos - Deletar")
+    tela_deletar.title("PowerOn - Deletar")
     tela_deletar.resizable(width=False, height=False)
+    tela_deletar.iconbitmap("icon_poweron.ico")
 
     # Restaura a janela principal
     def fechar_tela_deletar():
@@ -1877,8 +1880,9 @@ def tela_totalFaturado():
     app.withdraw()
     tela_totalFaturado= ctk.CTkToplevel(app)
     tela_totalFaturado.geometry("1080x720")
-    tela_totalFaturado.title("Trabalho Bagos - Total Faturado")
+    tela_totalFaturado.title("PowerOn - Total Faturado")
     tela_totalFaturado.resizable(width=False, height=False)
+    tela_totalFaturado.iconbitmap("icon_poweron.ico")
 
     # Restaura a janela principal
     def fechar_tela_totalFaturado():
@@ -1891,8 +1895,9 @@ def tela_leituraExaustiva():
     app.withdraw()
     tela_leituraExaustiva= ctk.CTkToplevel(app)
     tela_leituraExaustiva.geometry("1080x720")
-    tela_leituraExaustiva.title("Trabalho Bagos - Leitura Exaustiva")
+    tela_leituraExaustiva.title("PowerOn - Leitura Exaustiva")
     tela_leituraExaustiva.resizable(width=False, height=False)
+    tela_leituraExaustiva.iconbitmap("icon_poweron.ico")
 
     # Restaura a janela principal
     def fechar_tela_leituraExaustiva():
@@ -1924,5 +1929,14 @@ btn_deletar= ctk.CTkButton(master=app, text="Deletar", command=tela_deletar).pla
 btn_leitura= ctk.CTkButton(master=app, text="Leitura Exaustiva", command=tela_leituraExaustiva).place(x=600, y=360)
 btn_fatura= ctk.CTkButton(master=app, text="Total Faturado", command=tela_totalFaturado).place(x=500, y=460)
 
+#rodadpe
+rodape = ctk.CTkFrame(app, height=40, fg_color="#2e2e2e")
+rodape.pack(side="bottom", fill="x")
+label_rodape = ctk.CTkLabel(rodape, text="© 2025 Sistema Academia PowerOn - Arthur M. Rieger e Carlos E. Zaul ", text_color="white")
+label_rodape.pack(pady=10)
+
 
 app.mainloop()
+
+
+
