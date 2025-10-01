@@ -201,28 +201,35 @@ def inserirCidade(cod, descCi, estado,  output=None):
             print(msg)
         return False
 
-def buscarCidade():
+def buscarCidade(cod, output=None):
     try:
-        busca = int(input("Digite o codigo da cidade: "))
-    except:
-        print("Apenas valor inteiro!")
-        return
+        with open("dados/cidades.txt", "r", encoding="utf-8") as arq:
+            for linha in arq:
+                partes = linha.strip().split(";")
+                if int(partes[0]) == cod:
+                    descricao = partes[1]
+                    estado = partes[2]
 
-    posicao = arvoreCidades.buscar(busca)
-    if posicao is None:
-        print("Cidade não encontrada no índice!")
-        return
+                    msg = f"Cidade {descricao} (cód {cod}) - Estado: {estado}"
+                    if output:
+                        output.insert("end", msg + "\n")
+                    else:
+                        print(msg)
+                    return True
 
-    arquivo= open("dados/cidades.txt", "r", encoding="utf-8")
-    arquivo.seek(posicao)
-    linha = arquivo.readline()
-    itens = linha.strip().split(";")
-    cidade = Cidade(int(itens[0]), itens[1], itens[2])
-    print("Codigo: ", cidade.cod)
-    print("Descricao: ", cidade.descricao)
-    print("Estado: ", cidade.estado)
-    arquivo.close()
-    print("\n\n")
+        msg = f"Cidade com código {cod} não encontrada."
+        if output:
+            output.insert("end", msg + "\n")
+        else:
+            print(msg)
+        return False
+    except Exception as e:
+        msg = f"Erro ao buscar cidade: {e}"
+        if output:
+            output.insert("end", msg + "\n")
+        else:
+            print(msg)
+        return False
 
 def excluirCidade():
     try:
@@ -389,50 +396,67 @@ def inserirAluno(cod, nome, codigoCidade, dataNascimento, peso, altura, output=N
             print(msg)
         return False
 
-def buscarAluno():
+def buscarAluno(cod, output=None):
     try:
-        busca = int(input("Digite o codigo do Aluno: "))
-    except:
-        print("Apenas valor inteiro!")
-        return
+        with open("dados/alunos.txt", "r", encoding="utf-8") as arq:
+            for linha in arq:
+                partes = linha.strip().split(";")
+                if int(partes[0]) == cod:
+                    nome = partes[1]
+                    codCidade = int(partes[2])
+                    dataNascimento = partes[3]
+                    peso = float(partes[4])
+                    altura = float(partes[5])
 
-    posicao = arvoreAlunos.buscar(busca)
-    if posicao is None:
-        print("Aluno não encontrado no índice!")
-        return
+                    imc = peso / (altura ** 2)
 
-    arquivo= open("dados/alunos.txt", "r", encoding="utf-8")
-    arquivo.seek(posicao)
-    linha = arquivo.readline()
-    itens = linha.strip().split(";")
-    aluno = Aluno(int(itens[0]), itens[1], int(itens[2]), itens[3], float(itens[4]), float(itens[5]))
-    arquivo.close()
-    codCidade = aluno.codCidade
-    posicaoCidade = arvoreCidades.buscar(codCidade)
-    if posicaoCidade is None:
-        nomeCidade = "Cidade não encontrada!"
-        nomeEstado = ""
-    else:
-        arquivo = open("dados/cidades.txt", "r", encoding="utf-8")
-        arquivo.seek(posicaoCidade)
-        linha = arquivo.readline()
-        itens = linha.strip().split(";")
-        nomeCidade = itens[1]
-        nomeEstado = itens[2]
+                    if imc < 18.5:
+                        diag = "Abaixo do peso"
+                    elif imc < 25:
+                        diag = "Peso normal"
+                    elif imc < 30:
+                        diag = "Sobrepeso"
+                    else:
+                        diag = "Obesidade"
 
-    print("Nome do aluno: ", aluno.nome)
-    print("Data de Nascimento: ", aluno.dataNascimento)
-    print("Nome da Cidade: ", nomeCidade)
-    print("Nome do Estado: ", nomeEstado)
-    print("Peso: ", aluno.peso)
-    print("Altura: ", aluno.altura)
 
-    imc, diagnostico = aluno.imc()
-    print(f"IMC: {imc:.2f}")
-    print("Diagnostico: ", diagnostico)
+                    cidade = "Desconhecida"
+                    estado = ""
+                    with open("dados/cidades.txt", "r", encoding="utf-8") as arqCid:
+                        for linhaCid in arqCid:
+                            partesCid = linhaCid.strip().split(";")
+                            if int(partesCid[0]) == codCidade:
+                                cidade = partesCid[1]
+                                estado = partesCid[2]
+                                break
 
-    arquivo.close()
-    print("\n\n")
+                    msg = (
+                        f"Aluno {nome} (cód {cod})\n"
+                        f"Data de Nascimento: {dataNascimento}\n"
+                        f"Peso: {peso:.2f} kg - Altura: {altura:.2f} m\n"
+                        f"IMC: {imc:.2f} ({diag})\n"
+                        f"Cidade: {cidade}/{estado}\n"
+                    )
+
+                    if output:
+                        output.insert("end", msg + "\n")
+                    else:
+                        print(msg)
+                    return True
+
+        msg = f"Aluno com código {cod} não encontrado."
+        if output:
+            output.insert("end", msg + "\n")
+        else:
+            print(msg)
+        return False
+    except Exception as e:
+        msg = f"Erro ao buscar aluno: {e}"
+        if output:
+            output.insert("end", msg + "\n")
+        else:
+            print(msg)
+        return False
 
 def excluirAluno():
     try:
@@ -604,44 +628,44 @@ def inserirProfessor(cod, nome, codCidade, endereco, telefone, output=None):
             print(msg)
         return False
 
-def buscarProfessor():
+def buscarProfessor(cod, output=None):
     try:
-        busca = int(input("Digite o codigo do Professor: "))
-    except:
-        print("Apenas valor inteiro!")
-        return
+        with open("dados/professor.txt", "r", encoding="utf-8") as arq:
+            for linha in arq:
+                partes = linha.strip().split(";")
+                if int(partes[0]) == cod:
+                    nome = partes[1]
+                    codCidade = int(partes[2])
 
-    posicao = arvoreProfessores.buscar(busca)
-    if posicao is None:
-        print("Professor não encontrado no índice!")
-        return
 
-    arquivo = open("dados/professor.txt", "r", encoding="utf-8")
-    arquivo.seek(posicao)
-    linha = arquivo.readline()
-    itens = linha.strip().split(";")
-    professor = Professor(int(itens[0]), itens[1], itens[2], itens[3], int(itens[4]))
-    codCidade = professor.codCidade
-    posicaoCidade = arvoreCidades.buscar(codCidade)
+                    cidade, estado = "Desconhecida", "??"
+                    with open("dados/cidades.txt", "r", encoding="utf-8") as arq_cid:
+                        for linha_cid in arq_cid:
+                            p = linha_cid.strip().split(";")
+                            if int(p[0]) == codCidade:
+                                cidade, estado = p[1], p[2]
+                                break
 
-    if posicaoCidade is None:
-        nomeCidade = "Cidade não encontrada!"
-        nomeEstado = ""
-    else:
-        arquivo = open("dados/cidades.txt", "r", encoding="utf-8")
-        arquivo.seek(posicaoCidade)
-        linha = arquivo.readline()
-        itens = linha.strip().split(";")
-        nomeCidade = itens[1]
-        nomeEstado = itens[2]
+                    msg = f"Professor {nome} (cód {cod}) - Cidade: {cidade}/{estado}"
+                    if output:
+                        output.insert("end", msg + "\n")
+                    else:
+                        print(msg)
+                    return True
 
-    print("Nome do Professor: ", professor.nome)
-    print("Telefone: ", professor.telefone)
-    print("Endereço: ", professor.endereco)
-    print("Cidade: ", nomeCidade)
-    print("Nome do Estado: ", nomeEstado)
-    arquivo.close()
-    print("\n\n")
+        msg = f"Professor com código {cod} não encontrado."
+        if output:
+            output.insert("end", msg + "\n")
+        else:
+            print(msg)
+        return False
+    except Exception as e:
+        msg = f"Erro ao buscar professor: {e}"
+        if output:
+            output.insert("end", msg + "\n")
+        else:
+            print(msg)
+        return False
 
 def excluirProfessor():
     try:
@@ -827,60 +851,52 @@ def inserirModalidade(cod, descricao, codProf, valor, limite, output=None):
             print(msg)
         return False
 
-def buscarModalidade():
-    while True:
-        try:
-            busca = int(input("Digite o codigo da Modalidade: "))
-            break
-        except:
-            print("Apenas valor inteiro!")
-            continue
+def buscarModalidade(cod, output=None):
+    try:
+        with open("dados/modalidade.txt", "r", encoding="utf-8") as arq:
+            for linha in arq:
+                partes = linha.strip().split(";")
+                if int(partes[0]) == cod:
+                    desc = partes[1]
+                    codProf = int(partes[2])
+                    valor = float(partes[3])
+                    limite = int(partes[4])
+                    total = int(partes[5])
 
 
-    posicao = arvoreModalidades.buscar(busca)
+                    nomeProf = "Desconhecido"
+                    with open("dados/professor.txt", "r", encoding="utf-8") as arq_prof:
+                        for linha_prof in arq_prof:
+                            p = linha_prof.strip().split(";")
+                            if int(p[0]) == codProf:
+                                nomeProf = p[1]
+                                break
 
-    if posicao is None:
-        print("Modalidade não encontrada no índice!")
-        return
+                    msg = (
+                        f"Modalidade {desc} (cód {cod})\n"
+                        f"Professor: {nomeProf}\n"
+                        f"Valor: R$ {valor:.2f}\n"
+                        f"Limite: {limite}, Total atual: {total}"
+                    )
+                    if output:
+                        output.insert("end", msg + "\n")
+                    else:
+                        print(msg)
+                    return True
 
-    arquivo = open("dados/modalidades.txt", "r", encoding="utf-8")
-    arquivo.seek(posicao)
-    linha = arquivo.readline()
-    itens = linha.strip().split(";")
-    modalidade = Modalidade(int(itens[0]), itens[1], int(itens[2]), float(itens[3]), int(itens[4]), int(itens[5]))
-    codProfessor = modalidade.codProfessor
-    posicaoProfessor = arvoreProfessores.buscar(codProfessor)
-    arquivo.close()
-
-    if posicaoProfessor is None:
-        nomeProfessor = "Professor não encontrado!"
-        nomeCidade = ""
-    else:
-        arquivo = open("dados/professor.txt", "r", encoding="utf-8")
-        arquivo.seek(posicaoProfessor)
-        linha = arquivo.readline()
-        itens = linha.strip().split(";")
-        nomeProfessor = itens[1]
-        codCidade = int(itens[4])
-        posicaoCidade = arvoreCidades.buscar(codCidade)
-
-        if posicaoCidade is None:
-            nomeCidade = "Cidade não encontrada!"
+        msg = f"Modalidade com código {cod} não encontrada."
+        if output:
+            output.insert("end", msg + "\n")
         else:
-            arquivo = open("dados/cidades.txt", "r", encoding="utf-8")
-            arquivo.seek(posicaoCidade)
-            linha = arquivo.readline()
-            itens = linha.strip().split(";")
-            nomeCidade = itens[1]
-
-    print("Descricão da Modalidade: ", modalidade.descricao)
-    print("Professor: ",nomeProfessor)
-    print("Cidade do Professor: ", nomeCidade)
-    print("Valor da aula: ",modalidade.valor)
-    print("Limite de alunos: ",modalidade.limiteAlunos)
-    print("Total de alunos: ",modalidade.totalAlunos)
-    arquivo.close()
-    print("\n\n")
+            print(msg)
+        return False
+    except Exception as e:
+        msg = f"Erro ao buscar modalidade: {e}"
+        if output:
+            output.insert("end", msg + "\n")
+        else:
+            print(msg)
+        return False
 
 def excluirModalidade():
     try:
@@ -1104,73 +1120,68 @@ def inserirMatricula(cod, codAluno, codModalidade, qtdaulas, output=None):
             print(msg)
         return False
 
-
-def buscarMatricula():
+def buscarMatricula(cod, output=None):
     try:
-        busca = int(input("Digite o codigo da Matrícula: "))
-    except:
-        print("Apenas valor inteiro!")
+        with open("dados/matriculas.txt", "r", encoding="utf-8") as arq:
+            for linha in arq:
+                partes = linha.strip().split(";")
+                if int(partes[0]) == cod:
+                    codAluno = int(partes[1])
+                    codModalidade = int(partes[2])
+                    qtdaulas = int(partes[3])
 
 
-    posicao = arvoreMatriculas.buscar(busca)
-    if posicao is None:
-        print("Matrícula não encontrada no índice!")
-        return
+                    aluno_nome, cidade, estado = "?", "?", "?"
+                    with open("dados/alunos.txt", "r", encoding="utf-8") as arq_al:
+                        for l in arq_al:
+                            p = l.strip().split(";")
+                            if int(p[0]) == codAluno:
+                                aluno_nome = p[1]
+                                codCidade = int(p[2])
+                                # busca cidade
+                                with open("dados/cidades.txt", "r", encoding="utf-8") as arq_cid:
+                                    for lc in arq_cid:
+                                        pc = lc.strip().split(";")
+                                        if int(pc[0]) == codCidade:
+                                            cidade, estado = pc[1], pc[2]
+                                            break
+                                break
 
-    arquivo = open("dados/matriculas.txt", "r", encoding="utf-8")
-    arquivo.seek(posicao)
-    linha = arquivo.readline()
-    itens = linha.strip().split(";")
-    matricula = Matricula(int(itens[0]), int(itens[1]), int(itens[2]), int(itens[3]))
-    arquivo.close()
-    codAluno = matricula.codAluno
-    codModalidade= matricula.codModalidade
 
-    posicaoAluno = arvoreAlunos.buscar(codAluno)
-    if posicaoAluno is None:
-        nomeAluno = "Aluno não encontrado"
-        codCidade = None
-        nomeCidade=""
-    else:
-        arquivo = open("dados/alunos.txt", "r", encoding="utf-8")
-        arquivo.seek(posicaoAluno)
-        linha = arquivo.readline()
-        itens = linha.strip().split(";")
-        nomeAluno = itens[1]
-        codCidade = int(itens[2])
-        arquivo.close()
+                    desc, valor = "?", 0
+                    with open("dados/modalidade.txt", "r", encoding="utf-8") as arq_mod:
+                        for l in arq_mod:
+                            p = l.strip().split(";")
+                            if int(p[0]) == codModalidade:
+                                desc, valor = p[1], float(p[3])
+                                break
 
-    if codCidade is None:
-        nomeCidade = ""
-    else:
-        posicaoCidade = arvoreCidades.buscar(codCidade)
-        if posicaoCidade is None:
-            nomeCidade = ""
+                    valor_total = valor * qtdaulas
+                    msg = (
+                        f"Matrícula {cod}\n"
+                        f"Aluno: {aluno_nome} - {cidade}/{estado}\n"
+                        f"Modalidade: {desc}\n"
+                        f"Aulas: {qtdaulas}, Valor a pagar: R$ {valor_total:.2f}"
+                    )
+                    if output:
+                        output.insert("end", msg + "\n")
+                    else:
+                        print(msg)
+                    return True
+
+        msg = f"Matrícula {cod} não encontrada."
+        if output:
+            output.insert("end", msg + "\n")
         else:
-            arquivo = open("dados/cidades.txt", "r", encoding="utf-8")
-            arquivo.seek(posicaoCidade)
-            linha = arquivo.readline()
-            itens = linha.strip().split(";")
-            nomeCidade = itens[1]
-            arquivo.close()
-
-
-    posicaoModalidade = arvoreModalidades.buscar(codModalidade)
-    if posicaoModalidade is None:
-        descricaoModalidade = "Modalidade não encontrada"
-    else:
-        arquivo = open("dados/modalidades.txt", "r", encoding="utf-8")
-        arquivo.seek(posicaoModalidade)
-        linha = arquivo.readline()
-        itens = linha.strip().split(";")
-        descricaoModalidade = itens[1]
-        valorDaAula = float(itens[3])
-
-    print("Nome do Aluno Cadastrado: ", nomeAluno)
-    print("Cidade do aluno: ", nomeCidade)
-    print("Modalidade: ", descricaoModalidade)
-    print("Quantidade de aulas: ", matricula.qtdeAulas)
-    print(f"Valor a pagar: R$ {matricula.qtdeAulas * valorDaAula:.2f}")
+            print(msg)
+        return False
+    except Exception as e:
+        msg = f"Erro ao buscar matrícula: {e}"
+        if output:
+            output.insert("end", msg + "\n")
+        else:
+            print(msg)
+        return False
 
 def excluirMatricula():
     try:
@@ -1433,7 +1444,7 @@ app.resizable(width=False, height=False)
 
 #inconify fecha a janela e deiconify reabre
 
-#abas das telas
+#abas das telas - Inserir
 
 def aba_inserir_alunos(tab):
     # Labels e entradas
@@ -1661,6 +1672,109 @@ def aba_inserir_cidade(tab):
     btn_salvar = ctk.CTkButton(tab, text="Salvar Cidade", command=salvar_cid)
     btn_salvar.grid(row=6, column=0, columnspan=2, pady=10)
 
+#abas das telas - Buscar
+
+def aba_buscar_alunos(tab):
+    lbl_cod = ctk.CTkLabel(tab, text="Código do Aluno:")
+    lbl_cod.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+    ent_cod = ctk.CTkEntry(tab)
+    ent_cod.grid(row=0, column=1, padx=10, pady=5)
+
+    output = ctk.CTkTextbox(tab, height=200, width=400)
+    output.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+
+    def buscar():
+        try:
+            cod = int(ent_cod.get())
+            output.delete("1.0", "end")
+            buscarAluno(cod, output)
+        except Exception as e:
+            output.insert("end", f"Erro: {e}\n")
+
+    btn = ctk.CTkButton(tab, text="Buscar Aluno", command=buscar)
+    btn.grid(row=1, column=0, columnspan=2, pady=10)
+
+def aba_buscar_professores(tab):
+    lbl_cod = ctk.CTkLabel(tab, text="Código do Professor:")
+    lbl_cod.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+    ent_cod = ctk.CTkEntry(tab)
+    ent_cod.grid(row=0, column=1, padx=10, pady=5)
+
+    output = ctk.CTkTextbox(tab, height=200, width=400)
+    output.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+
+    def buscar():
+        try:
+            cod = int(ent_cod.get())
+            output.delete("1.0", "end")
+            buscarProfessor(cod, output)
+        except Exception as e:
+            output.insert("end", f"Erro: {e}\n")
+
+    btn = ctk.CTkButton(tab, text="Buscar Professor", command=buscar)
+    btn.grid(row=1, column=0, columnspan=2, pady=10)
+
+def aba_buscar_modalidade(tab):
+    lbl_cod = ctk.CTkLabel(tab, text="Código da Modalidade:")
+    lbl_cod.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+    ent_cod = ctk.CTkEntry(tab)
+    ent_cod.grid(row=0, column=1, padx=10, pady=5)
+
+    output = ctk.CTkTextbox(tab, height=200, width=400)
+    output.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+
+    def buscar():
+        try:
+            cod = int(ent_cod.get())
+            output.delete("1.0", "end")
+            buscarModalidade(cod, output)
+        except Exception as e:
+            output.insert("end", f"Erro: {e}\n")
+
+    btn = ctk.CTkButton(tab, text="Buscar Modalidade", command=buscar)
+    btn.grid(row=1, column=0, columnspan=2, pady=10)
+
+def aba_buscar_matricula(tab):
+    lbl_cod = ctk.CTkLabel(tab, text="Código da Matrícula:")
+    lbl_cod.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+    ent_cod = ctk.CTkEntry(tab)
+    ent_cod.grid(row=0, column=1, padx=10, pady=5)
+
+    output = ctk.CTkTextbox(tab, height=200, width=400)
+    output.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+
+    def buscar():
+        try:
+            cod = int(ent_cod.get())
+            output.delete("1.0", "end")
+            buscarMatricula(cod, output)
+        except Exception as e:
+            output.insert("end", f"Erro: {e}\n")
+
+    btn = ctk.CTkButton(tab, text="Buscar Matrícula", command=buscar)
+    btn.grid(row=1, column=0, columnspan=2, pady=10)
+
+def aba_buscar_cidade(tab):
+    lbl_cod = ctk.CTkLabel(tab, text="Código da Cidade:")
+    lbl_cod.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+    ent_cod = ctk.CTkEntry(tab)
+    ent_cod.grid(row=0, column=1, padx=10, pady=5)
+
+    output = ctk.CTkTextbox(tab, height=200, width=400)
+    output.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+
+    def buscar():
+        try:
+            cod = int(ent_cod.get())
+            output.delete("1.0", "end")
+            buscarCidade(cod, output)
+        except Exception as e:
+            output.insert("end", f"Erro: {e}\n")
+
+    btn = ctk.CTkButton(tab, text="Buscar Cidade", command=buscar)
+    btn.grid(row=1, column=0, columnspan=2, pady=10)
+
+
 #novas telas
 
 def tela_inserir():
@@ -1724,6 +1838,12 @@ def tela_buscar():
     tabview.tab("Matricula").grid_columnconfigure(0, weight=1)
     tabview.tab("Modalidade").grid_columnconfigure(0, weight=1)
     tabview.tab("Cidade").grid_columnconfigure(0, weight=1)
+
+    aba_buscar_alunos(tabview.tab("Alunos"))
+    aba_buscar_professores(tabview.tab("Professores"))
+    aba_buscar_modalidade(tabview.tab("Modalidade"))
+    aba_buscar_matricula(tabview.tab("Matricula"))
+    aba_buscar_cidade(tabview.tab("Cidade"))
 
 def tela_deletar():
     app.withdraw()
