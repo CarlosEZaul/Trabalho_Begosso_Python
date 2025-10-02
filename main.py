@@ -1189,17 +1189,17 @@ def deletarMatricula(cod, output):
                 arvoreModalidades.raiz = None
                 for linha in linhas:
                     itens = linha.strip().split(";")
-                    if len(itens) < 5:
+                    if len(itens) < 6:
                         continue
                     if int(itens[0]) == codModa:
-
                         codM = int(itens[0])
                         desc = itens[1]
                         codProf = int(itens[2])
                         valor = float(itens[3])
-                        total = int(itens[4]) - 1 if int(itens[4]) > 0 else 0
+                        limite = int(itens[4])
+                        total = int(itens[5]) - 1 if int(itens[4]) > 0 else 0
 
-                        novaLinha = f"{codM};{desc};{codProf};{valor};{total}\n"
+                        novaLinha = f"{codM};{desc};{codProf};{valor}; {limite};{total}\n"
                         posicao = arquivo.tell()
                         arquivo.write(novaLinha)
                         arvoreModalidades.inserir(codM, posicao)
