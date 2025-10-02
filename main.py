@@ -1326,73 +1326,73 @@ def leituraExaustivaMatricula():
     arquivoModalidades.close()
     arquivoProfessores.close()
 #-------------------------TOTAL FATURADO---------------------#
-def totalFaturado():
-    while True:
-        try:
-            cod = int(input("Digite o codigo da Modalidade (0 cancela): "))
-            break
-        except:
-            print("Apenas valor inteiro!")
-            continue
+def totalFaturado(cod, output):
+    try:
+        posicao = arvoreModalidades.buscar(cod)
+        if posicao is None:
+            output.insert("end", "Modalidade não encontrada!\n")
+            return
 
-    if cod == 0:
-        print("Operação cancelada!")
-        return
 
-    posicao = arvoreModalidades.buscar(cod)
-    if posicao is None:
-        print("Modalidade não encontrada!")
-        return
-
-    arquivo = open("dados/modalidades.txt", "r", encoding="utf-8")
-    arquivo.seek(posicao)
-    itens = arquivo.readline().strip().split(";")
-    arquivo.close()
-
-    modalidade = Modalidade(int(itens[0]), itens[1], int(itens[2]), float(itens[3]), int(itens[4]), int(itens[5]))
-    descricao = modalidade.descricao
-    codProfessor = modalidade.codProfessor
-
-    nomeProfessor = "Professor não encontrado!"
-    cidadeProfessor = ""
-    codCidade = None
-
-    if codProfessor is not None:
-        posicaoProfessor = arvoreProfessores.buscar(codProfessor)
-        if posicaoProfessor is not None:
-            arquivo = open("dados/professor.txt", "r", encoding="utf-8")
-            arquivo.seek(posicaoProfessor)
+        with open("dados/modalidades.txt", "r", encoding="utf-8") as arquivo:
+            arquivo.seek(posicao)
             itens = arquivo.readline().strip().split(";")
-            arquivo.close()
-            nomeProfessor = itens[1]
-            codCidade = int(itens[4])
 
-    if codCidade is not None:
-        posicaoCidade = arvoreCidades.buscar(codCidade)
-        if posicaoCidade is not None:
-            arquivo = open("dados/cidades.txt", "r", encoding="utf-8")
-            arquivo.seek(posicaoCidade)
-            itens = arquivo.readline().strip().split(";")
-            arquivo.close()
-            cidadeProfessor = itens[1]
+        if len(itens) < 6:
+            output.insert("end", "Erro ao ler modalidade.\n")
+            return
 
-    totalAlunos = 0
-    valorFaturado = 0
-    arquivo = open("dados/matriculas.txt", "r", encoding="utf-8")
-    for linha in arquivo:
-        itens = linha.strip().split(";")
-        codModMatricula = int(itens[2])
-        if codModMatricula == cod:
-            qtdeAulas = int(itens[3])
-            valorFaturado += qtdeAulas * modalidade.valor
-            totalAlunos += 1
-    arquivo.close()
+        modalidade = Modalidade(int(itens[0]), itens[1], int(itens[2]),
+                                int(itens[3]), int(itens[4]), int(itens[5]))
+        descricao = modalidade.descricao
+        codProfessor = modalidade.codProfessor
 
-    print("Modalidade: ", descricao)
-    print("Professor: ", nomeProfessor)
-    print("Cidade do professor: ", cidadeProfessor)
-    print("Total alunos: ", totalAlunos)
-    print(f"Valor faturado: R${valorFaturado:.2f}")
+        nomeProfessor = "Professor não encontrado!"
+        cidadeProfessor = ""
+
+
+        if codProfessor is not None:
+            posicaoProfessor = arvoreProfessores.buscar(codProfessor)
+            if posicaoProfessor is not None:
+                with open("dados/professor.txt", "r", encoding="utf-8") as arquivo:
+                    arquivo.seek(posicaoProfessor)
+                    itens = arquivo.readline().strip().split(";")
+                if len(itens) >= 5:
+                    nomeProfessor = itens[1]
+                    codCidade = int(itens[4])
+
+
+                    posicaoCidade = arvoreCidades.buscar(codCidade)
+                    if posicaoCidade is not None:
+                        with open("dados/cidades.txt", "r", encoding="utf-8") as arquivo:
+                            arquivo.seek(posicaoCidade)
+                            itens = arquivo.readline().strip().split(";")
+                        if len(itens) >= 2:
+                            cidadeProfessor = itens[1]
+
+
+        totalAlunos = 0
+        valorFaturado = 0
+        with open("dados/matriculas.txt", "r", encoding="utf-8") as arquivo:
+            for linha in arquivo:
+                itens = linha.strip().split(";")
+                if len(itens) >= 4:
+                    codModMatricula = int(itens[2])
+                    if codModMatricula == cod:
+                        qtdeAulas = int(itens[3])
+                        valorFaturado += qtdeAulas * modalidade.valor
+                        totalAlunos += 1
+
+
+        output.insert("end", f"Modalidade: {descricao}\n")
+        output.insert("end", f"Professor: {nomeProfessor}\n")
+        output.insert("end", f"Cidade do Professor: {cidadeProfessor}\n")
+        output.insert("end", f"Total de alunos: {totalAlunos}\n")
+        output.insert("end", f"Valor faturado: R${valorFaturado:.2f}\n\n")
+
+    except Exception as e:
+        output.insert("end", f"Erro ao calcular faturamento: {e}\n")
+
 
 
 if not os.path.exists("dados"):
@@ -1510,7 +1510,7 @@ def aba_inserir_professores(tab):
             nome = ent_nome.get()
             codCidade = int(ent_codCi.get())
             endereco = ent_endereco.get()
-            telefone = float(ent_tel.get())
+            telefone = int(ent_tel.get())
 
 
 
@@ -1845,6 +1845,29 @@ def aba_deletar_cidade(tab):
     btn = ctk.CTkButton(tab, text="Deletar Cidade", command=deletar)
     btn.grid(row=1, column=0, columnspan=2, pady=10)
 
+#abas das telas - Total faturado
+
+def aba_total_faturado(tab):
+    lbl_cod = ctk.CTkLabel(tab, text="Código da Modalidade:")
+    lbl_cod.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+    ent_cod = ctk.CTkEntry(tab)
+    ent_cod.grid(row=0, column=1, padx=10, pady=5)
+
+    output = ctk.CTkTextbox(tab, height=180, width=420)
+    output.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+
+    def calcular():
+        output.delete("1.0", "end")
+        try:
+            cod = int(ent_cod.get())
+            totalFaturado(cod, output)
+        except ValueError:
+            output.insert("end", "Digite um código válido!\n")
+
+    btn_calc = ctk.CTkButton(tab, text="Calcular Faturamento", command=calcular)
+    btn_calc.grid(row=1, column=0, columnspan=2, pady=10)
+
+
 #novas telas
 
 def tela_inserir():
@@ -1952,7 +1975,6 @@ def tela_deletar():
     aba_deletar_modalidade(tabview.tab("Modalidade"))
     aba_deletar_cidade(tabview.tab("Cidade"))
 
-
 def tela_totalFaturado():
     app.withdraw()
     tela_totalFaturado= ctk.CTkToplevel(app)
@@ -1967,6 +1989,14 @@ def tela_totalFaturado():
         app.deiconify()
 
     tela_totalFaturado.protocol("WM_DELETE_WINDOW", fechar_tela_totalFaturado)
+
+    # Seleção de quem vai ser/navbar
+    tabview = ctk.CTkTabview(tela_totalFaturado, height=1080, width=720, corner_radius=20)
+    tabview.pack(fill="both")
+    tabview.add("Total Faturado")
+    tabview.tab("Total Faturado").grid_columnconfigure(0, weight=1)
+
+    aba_total_faturado(tabview.tab("Total Faturado"))
 
 def tela_leituraExaustiva():
     app.withdraw()
