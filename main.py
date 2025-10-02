@@ -1343,7 +1343,7 @@ def totalFaturado(cod, output):
             return
 
         modalidade = Modalidade(int(itens[0]), itens[1], int(itens[2]),
-                                int(itens[3]), int(itens[4]), int(itens[5]))
+                                float(itens[3]), int(itens[4]), int(itens[5]))
         descricao = modalidade.descricao
         codProfessor = modalidade.codProfessor
 
