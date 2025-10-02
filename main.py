@@ -230,35 +230,29 @@ def buscarCidade(cod, output=None):
             print(msg)
         return False
 
-def excluirCidade():
+def deletarCidade(cod, output):
     try:
-        cod = int(input("Digite o código da cidade para excluir (0 cancela): "))
-    except:
-        print("Apenas valor inteiro!")
-        return
+        if arvoreCidades.buscar(cod) is None:
+            output.insert("end", "Cidade não encontrada!\n")
+            return
 
-    if cod == 0:
-        print("Operação cancelada.")
-        return
+        arquivo = open("dados/cidades.txt", "r", encoding="utf-8")
+        linhas = arquivo.readlines()
+        arquivo.close()
 
-    if arvoreCidades.buscar(cod) is None:
-        print("Cidade não encontrada!")
-        return
+        arquivo = open("dados/cidades.txt", "w", encoding="utf-8")
+        arvoreCidades.raiz = None
+        for linha in linhas:
+            itens = linha.strip().split(";")
+            if int(itens[0]) != cod:
+                posicao = arquivo.tell()
+                arquivo.write(linha)
+                arvoreCidades.inserir(int(itens[0]), posicao)
 
-    arquivo= open("dados/cidades.txt", "r", encoding="utf-8")
-    linhas = arquivo.readlines()
-
-    arquivo= open("dados/cidades.txt", "w", encoding="utf-8")
-    arvoreCidades.raiz = None
-    for linha in linhas:
-        itens = linha.strip().split(";")
-        if int(itens[0]) != cod:
-            cidade = Cidade(int(itens[0]), itens[1], itens[2])
-            posicao = arquivo.tell()
-            arquivo.write(f"{cidade.cod};{cidade.descricao};{cidade.estado}\n")
-            arvoreCidades.inserir(cidade.cod, posicao)
-
-    print("Cidade excluída com sucesso!")
+        arquivo.close()
+        output.insert("end", "Cidade excluída com sucesso!\n")
+    except Exception as e:
+        output.insert("end", f"Erro: {e}\n")
 
 def leituraExaustivaCidade():
     if arvoreCidades.raiz is None:
@@ -457,36 +451,29 @@ def buscarAluno(cod, output=None):
             print(msg)
         return False
 
-def excluirAluno():
+def deletarAluno(cod, output):
     try:
-        cod = int(input("Digite o código do aluno para excluir (0 cancela): "))
-    except:
-        print("Apenas valor inteiro!")
-        return
+        if arvoreAlunos.buscar(cod) is None:
+            output.insert("end", "Aluno não encontrado!\n")
+            return
 
-    if cod == 0:
-        print("Operação cancelada.")
-        return
+        arquivo = open("dados/alunos.txt", "r", encoding="utf-8")
+        linhas = arquivo.readlines()
+        arquivo.close()
 
-    if arvoreAlunos.buscar(cod) is None:
-        print("Aluno não encontrada!")
-        return
+        arquivo = open("dados/alunos.txt", "w", encoding="utf-8")
+        arvoreAlunos.raiz = None
+        for linha in linhas:
+            itens = linha.strip().split(";")
+            if int(itens[0]) != cod:
+                posicao = arquivo.tell()
+                arquivo.write(linha)
+                arvoreAlunos.inserir(int(itens[0]), posicao)
 
-    arquivo= open("dados/alunos.txt", "r", encoding="utf-8")
-    linhas = arquivo.readlines()
-
-    arquivo= open("dados/alunos.txt", "w", encoding="utf-8")
-    arvoreAlunos.raiz = None
-    for linha in linhas:
-        itens = linha.strip().split(";")
-        if int(itens[0]) != cod:
-            aluno = Aluno(int(itens[0]), itens[1], int(itens[2]), itens[3], float(itens[4]), float(itens[5]))
-            posicao = arquivo.tell()
-            linha = f"{aluno.cod};{aluno.nome};{aluno.codCidade};{aluno.dataNascimento};{aluno.peso};{aluno.altura}\n"
-            arquivo.write(linha)
-            arvoreAlunos.inserir(aluno.cod, posicao)
-
-    print("Aluno excluída com sucesso!")
+        arquivo.close()
+        output.insert("end", "Aluno excluído com sucesso!\n")
+    except Exception as e:
+        output.insert("end", f"Erro: {e}\n")
 
 def leituraExaustivaAluno():
     if arvoreAlunos.raiz is None:
@@ -666,38 +653,30 @@ def buscarProfessor(cod, output=None):
             print(msg)
         return False
 
-def excluirProfessor():
+def deletarProfessor(cod, output):
     try:
-        cod = int(input("Digite o código do professor para excluir (0 cancela): "))
-    except:
-        print("Apenas valor inteiro!")
-        return
+        if arvoreProfessores.buscar(cod) is None:
+            output.insert("end", "Professor não encontrado!\n")
+            return
 
-    if cod == 0:
-        print("Operação cancelada.")
-        return
 
-    if arvoreProfessores.buscar(cod) is None:
-        print("Professor não encontrado!")
-        return
+        with open("dados/professor.txt", "r", encoding="utf-8") as arquivo:
+            linhas = arquivo.readlines()
 
-    arquivo = open("dados/professor.txt", "r", encoding="utf-8")
-    linhas = arquivo.readlines()
-    arquivo.close()
 
-    arquivo = open("dados/professor.txt", "w", encoding="utf-8")
-    arvoreProfessores.raiz = None
-    for linha in linhas:
-        itens = linha.strip().split(";")
-        if int(itens[0]) != cod:
-            professor = Professor(int(itens[0]), itens[1], itens[2], itens[3], int(itens[4]))
-            posicao = arquivo.tell()
-            linha = f"{professor.cod};{professor.nome};{professor.endereco};{professor.telefone};{professor.codCidade}\n"
-            arquivo.write(linha)
-            arvoreProfessores.inserir(professor.cod, posicao)
+        with open("dados/professor.txt", "w", encoding="utf-8") as arquivo:
+            arvoreProfessores.raiz = None
+            for linha in linhas:
+                itens = linha.strip().split(";")
+                if int(itens[0]) != cod:
+                    posicao = arquivo.tell()
+                    arquivo.write(linha)
+                    arvoreProfessores.inserir(int(itens[0]), posicao)
 
-    arquivo.close()
-    print("Professor excluído com sucesso!")
+        output.insert("end", "Professor excluído com sucesso!\n")
+
+    except Exception as e:
+        output.insert("end", f"Erro: {e}\n")
 
 def leituraExaustivaProfessor():
     if arvoreProfessores.raiz is None:
@@ -897,38 +876,29 @@ def buscarModalidade(cod, output=None):
             print(msg)
         return False
 
-def excluirModalidade():
+def deletarModalidade(cod, output):
     try:
-        cod = int(input("Digite o código da modalidade para excluir (0 cancela): "))
-    except:
-        print("Apenas valor inteiro!")
-        return
+        if arvoreModalidades.buscar(cod) is None:
+            output.insert("end", "Modalidade não encontrada!\n")
+            return
 
-    if cod == 0:
-        print("Operação cancelada.")
-        return
+        arquivo = open("dados/modalidades.txt", "r", encoding="utf-8")
+        linhas = arquivo.readlines()
+        arquivo.close()
 
-    if arvoreModalidades.buscar(cod) is None:
-        print("Modalidade não encontrada!")
-        return
+        arquivo = open("dados/modalidades.txt", "w", encoding="utf-8")
+        arvoreModalidades.raiz = None
+        for linha in linhas:
+            itens = linha.strip().split(";")
+            if int(itens[0]) != cod:
+                posicao = arquivo.tell()
+                arquivo.write(linha)
+                arvoreModalidades.inserir(int(itens[0]), posicao)
 
-    arquivo = open("dados/modalidades.txt", "r", encoding="utf-8")
-    linhas = arquivo.readlines()
-    arquivo.close()
-
-    arquivo = open("dados/modalidades.txt", "w", encoding="utf-8")
-    arvoreModalidades.raiz = None
-    for linha in linhas:
-        itens = linha.strip().split(";")
-        if int(itens[0]) != cod:
-            modalidade = Modalidade(int(itens[0]), itens[1], int(itens[2]),float(itens[3]), int(itens[4]), int(itens[5]))
-            posicao = arquivo.tell()
-            linha = f"{modalidade.cod};{modalidade.descricao};{modalidade.codProfessor};{modalidade.valor};{modalidade.limiteAlunos};{modalidade.totalAlunos}\n"
-            arquivo.write(linha)
-            arvoreModalidades.inserir(modalidade.cod, posicao)
-
-    arquivo.close()
-    print("Modalidade excluída com sucesso!")
+        arquivo.close()
+        output.insert("end", "Modalidade excluída com sucesso!\n")
+    except Exception as e:
+        output.insert("end", f"Erro: {e}\n")
 
 def leituraExaustivaModalidade():
     if arvoreProfessores.raiz is None:
@@ -1182,62 +1152,66 @@ def buscarMatricula(cod, output=None):
             print(msg)
         return False
 
-def excluirMatricula():
+def deletarMatricula(cod, output):
     try:
-        cod = int(input("Digite o codigo da Matricula (0 cancela): "))
-    except:
-        print("Apenas valor inteiro!")
-
-    if cod ==0:
-        print("Operaço cancelada!")
-
-    posicao = arvoreMatriculas.buscar(cod)
-    if posicao is None:
-        print("Código de matrícula não encontrado!")
-        return
-
-    arquivo = open("dados/matriculas.txt", "r", encoding="utf-8")
-    arquivo.seek(posicao)
-    linha = arquivo.readline()
-    itens = linha.strip().split(";")
-    codModalidade = int(itens[2])
-    arquivo.close()
+        if arvoreMatriculas.buscar(cod) is None:
+            output.insert("end", "Matrícula não encontrada!\n")
+            return
 
 
-    arquivo = open("dados/matriculas.txt", "r", encoding="utf-8")
-    linhas = arquivo.readlines()
-    arquivo.close()
+        with open("dados/matriculas.txt", "r", encoding="utf-8") as arquivo:
+            linhas = arquivo.readlines()
 
-    arquivo = open("dados/matriculas.txt", "w", encoding="utf-8")
-    arvoreMatriculas.raiz = None
-    for linha in linhas:
-        itens = linha.strip().split(";")
-        if int(itens[0]) != cod:
-            matricula = Matricula(int(itens[0]), int(itens[1]), int(itens[2]), int(itens[3]))
-            posicao = arquivo.tell()
-            linha = f"{matricula.cod};{matricula.codAluno};{matricula.codModalidade};{matricula.qtdeAulas}\n"
-            arquivo.write(linha)
-            arvoreMatriculas.inserir(matricula.cod, posicao)
-    arquivo.close()
+        matricula_removida = None
+        with open("dados/matriculas.txt", "w", encoding="utf-8") as arquivo:
+            arvoreMatriculas.raiz = None
+            for linha in linhas:
+                itens = linha.strip().split(";")
+                if len(itens) < 4:
+                    continue
+                if int(itens[0]) != cod:
+                    posicao = arquivo.tell()
+                    arquivo.write(linha)
+                    arvoreMatriculas.inserir(int(itens[0]), posicao)
+                else:
 
-    arquivo = open("dados/modalidades.txt", "r", encoding="utf-8")
-    linhas = arquivo.readlines()
-    arquivo.close()
+                    matricula_removida = itens
 
-    arquivo = open("dados/modalidades.txt", "w", encoding="utf-8")
-    arvoreMatriculas.raiz = None
-    for linha in linhas:
-        itens = linha.strip().split(";")
-        modalidade = Modalidade(int(itens[0]), itens[1], int(itens[2]), float(itens[3]), int(itens[4]), int(itens[5]))
-        if modalidade.cod == codModalidade:
-            modalidade.totalAlunos = max(0, modalidade.totalAlunos -1)
-        posicao = arquivo.tell()
-        linha = f"{modalidade.cod};{modalidade.descricao};{modalidade.codProfessor};{modalidade.valor};{modalidade.limiteAlunos};{modalidade.totalAlunos}\n"
-        arquivo.write(linha)
-        arvoreModalidades.inserir(modalidade.cod, posicao)
-    arquivo.close()
 
-    print("Matricula excluida!")
+        if matricula_removida:
+            codModa = int(matricula_removida[2])
+
+
+            with open("dados/modalidades.txt", "r", encoding="utf-8") as arquivo:
+                linhas = arquivo.readlines()
+
+            with open("dados/modalidades.txt", "w", encoding="utf-8") as arquivo:
+                arvoreModalidades.raiz = None
+                for linha in linhas:
+                    itens = linha.strip().split(";")
+                    if len(itens) < 5:
+                        continue
+                    if int(itens[0]) == codModa:
+
+                        codM = int(itens[0])
+                        desc = itens[1]
+                        codProf = int(itens[2])
+                        valor = float(itens[3])
+                        total = int(itens[4]) - 1 if int(itens[4]) > 0 else 0
+
+                        novaLinha = f"{codM};{desc};{codProf};{valor};{total}\n"
+                        posicao = arquivo.tell()
+                        arquivo.write(novaLinha)
+                        arvoreModalidades.inserir(codM, posicao)
+                    else:
+                        posicao = arquivo.tell()
+                        arquivo.write(linha)
+                        arvoreModalidades.inserir(int(itens[0]), posicao)
+
+        output.insert("end", "Matrícula excluída com sucesso!\n")
+
+    except Exception as e:
+        output.insert("end", f"Erro ao excluir matrícula: {e}\n")
 
 def leituraExaustivaMatricula():
     if arvoreMatriculas.raiz is None:
@@ -1774,6 +1748,102 @@ def aba_buscar_cidade(tab):
     btn = ctk.CTkButton(tab, text="Buscar Cidade", command=buscar)
     btn.grid(row=1, column=0, columnspan=2, pady=10)
 
+#abas das telas - Deletar
+
+def aba_deletar_aluno(tab):
+    lbl_cod = ctk.CTkLabel(tab, text="Código do Aluno:")
+    lbl_cod.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+    ent_cod = ctk.CTkEntry(tab)
+    ent_cod.grid(row=0, column=1, padx=10, pady=5)
+
+    output = ctk.CTkTextbox(tab, height=150, width=400)
+    output.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+
+    def deletar():
+        try:
+            cod = int(ent_cod.get())
+            deletarAluno(cod, output)
+        except Exception as e:
+            output.insert("end", f"Erro: {e}\n")
+
+    btn = ctk.CTkButton(tab, text="Deletar Aluno", command=deletar)
+    btn.grid(row=1, column=0, columnspan=2, pady=10)
+
+def aba_deletar_professores(tab):
+    lbl_cod = ctk.CTkLabel(tab, text="Código do Professor:")
+    lbl_cod.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+    ent_cod = ctk.CTkEntry(tab)
+    ent_cod.grid(row=0, column=1, padx=10, pady=5)
+
+    output = ctk.CTkTextbox(tab, height=150, width=400)
+    output.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+
+    def deletar():
+        try:
+            cod = int(ent_cod.get())
+            deletarProfessor(cod, output)
+        except Exception as e:
+            output.insert("end", f"Erro: {e}\n")
+
+    btn = ctk.CTkButton(tab, text="Deletar Professor", command=deletar)
+    btn.grid(row=1, column=0, columnspan=2, pady=10)
+
+def aba_deletar_modalidade(tab):
+    lbl_cod = ctk.CTkLabel(tab, text="Código do Modalidade:")
+    lbl_cod.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+    ent_cod = ctk.CTkEntry(tab)
+    ent_cod.grid(row=0, column=1, padx=10, pady=5)
+
+    output = ctk.CTkTextbox(tab, height=150, width=400)
+    output.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+
+    def deletar():
+        try:
+            cod = int(ent_cod.get())
+            deletarModalidade(cod, output)
+        except Exception as e:
+            output.insert("end", f"Erro: {e}\n")
+
+    btn = ctk.CTkButton(tab, text="Deletar Modalidade", command=deletar)
+    btn.grid(row=1, column=0, columnspan=2, pady=10)
+
+def aba_deletar_matricula(tab):
+    lbl_cod = ctk.CTkLabel(tab, text="Código do Matricula:")
+    lbl_cod.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+    ent_cod = ctk.CTkEntry(tab)
+    ent_cod.grid(row=0, column=1, padx=10, pady=5)
+
+    output = ctk.CTkTextbox(tab, height=150, width=400)
+    output.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+
+    def deletar():
+        try:
+            cod = int(ent_cod.get())
+            deletarMatricula(cod, output)
+        except Exception as e:
+            output.insert("end", f"Erro: {e}\n")
+
+    btn = ctk.CTkButton(tab, text="Deletar Matricula", command=deletar)
+    btn.grid(row=1, column=0, columnspan=2, pady=10)
+
+def aba_deletar_cidade(tab):
+    lbl_cod = ctk.CTkLabel(tab, text="Código do Cidade:")
+    lbl_cod.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+    ent_cod = ctk.CTkEntry(tab)
+    ent_cod.grid(row=0, column=1, padx=10, pady=5)
+
+    output = ctk.CTkTextbox(tab, height=150, width=400)
+    output.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+
+    def deletar():
+        try:
+            cod = int(ent_cod.get())
+            deletarCidade(cod, output)
+        except Exception as e:
+            output.insert("end", f"Erro: {e}\n")
+
+    btn = ctk.CTkButton(tab, text="Deletar Cidade", command=deletar)
+    btn.grid(row=1, column=0, columnspan=2, pady=10)
 
 #novas telas
 
@@ -1875,6 +1945,13 @@ def tela_deletar():
     tabview.tab("Matricula").grid_columnconfigure(0, weight=1)
     tabview.tab("Modalidade").grid_columnconfigure(0, weight=1)
     tabview.tab("Cidade").grid_columnconfigure(0, weight=1)
+
+    aba_deletar_aluno(tabview.tab("Alunos"))
+    aba_deletar_professores(tabview.tab("Professores"))
+    aba_deletar_matricula(tabview.tab("Matricula"))
+    aba_deletar_modalidade(tabview.tab("Modalidade"))
+    aba_deletar_cidade(tabview.tab("Cidade"))
+
 
 def tela_totalFaturado():
     app.withdraw()
