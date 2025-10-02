@@ -6,6 +6,7 @@ https://www.figma.com/design/L4DcA4jd65WRfwjTvDpnpK/Prototipo_telas_begs?node-id
 
 erro 
 qnd deleta uma matricula na hora de buscar modalidade da erro, deve estar relacionado ao total de alunos
+total faturado erro de variavel 
 
 terminar 
 total faturado
