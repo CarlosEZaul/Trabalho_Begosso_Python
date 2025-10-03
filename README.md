@@ -4,15 +4,12 @@ https://customtkinter.tomschimansky.com/documentation/
 Prototipo das telas (so pra organizar mais ou mneos como vai ser)
 https://www.figma.com/design/L4DcA4jd65WRfwjTvDpnpK/Prototipo_telas_begs?node-id=0-1&t=StZ1Uo94dw049BFu-1
 
-terminar 
-total faturado
-leitura exaustiva 
 
+erro 
+variavel tipo errado leitura exaustiva matricula
 
 Adicionar viadagens
 botão de limpar
-textos
-footer
 icone 
 logo
 botao voltar pagina
