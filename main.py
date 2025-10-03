@@ -1418,7 +1418,7 @@ app.iconbitmap("icon_poweron.ico")
 
 #inconify fecha a janela e deiconify reabre
 
-#abas das telas - Inserir
+#abas das telas - Inserir.
 
 def aba_inserir_alunos(tab):
     # Labels e entradas
