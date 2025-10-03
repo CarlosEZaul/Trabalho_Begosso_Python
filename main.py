@@ -1432,7 +1432,7 @@ def aba_inserir_alunos(tab):
     ent_nome = ctk.CTkEntry(tab)
     ent_nome.grid(row=1, column=1, padx=10, pady=5)
 
-    lbl_cidade = ctk.CTkLabel(tab, text="Código Cidade:")
+    lbl_cidade = ctk.CTkLabel(tab, text="Código da Cidade:")
     lbl_cidade.grid(row=2, column=0, padx=10, pady=5, sticky="w")
     ent_cidade = ctk.CTkEntry(tab)
     ent_cidade.grid(row=2, column=1, padx=10, pady=5)
@@ -1608,7 +1608,7 @@ def aba_inserir_matricula(tab):
         except Exception as e:
             output.insert("end", f"Erro: {e}\n")
 
-    btn_salvar = ctk.CTkButton(tab, text="Salvar Matricula", command=salvar_mat)
+    btn_salvar = ctk.CTkButton(tab, text="Salvar Matrícula", command=salvar_mat)
     btn_salvar.grid(row=6, column=0, columnspan=2, pady=10)
 
 def aba_inserir_cidade(tab):
@@ -1808,7 +1808,7 @@ def aba_deletar_modalidade(tab):
     btn.grid(row=1, column=0, columnspan=2, pady=10)
 
 def aba_deletar_matricula(tab):
-    lbl_cod = ctk.CTkLabel(tab, text="Código do Matricula:")
+    lbl_cod = ctk.CTkLabel(tab, text="Código da Matricula:")
     lbl_cod.grid(row=0, column=0, padx=10, pady=5, sticky="w")
     ent_cod = ctk.CTkEntry(tab)
     ent_cod.grid(row=0, column=1, padx=10, pady=5)
@@ -1827,7 +1827,7 @@ def aba_deletar_matricula(tab):
     btn.grid(row=1, column=0, columnspan=2, pady=10)
 
 def aba_deletar_cidade(tab):
-    lbl_cod = ctk.CTkLabel(tab, text="Código do Cidade:")
+    lbl_cod = ctk.CTkLabel(tab, text="Código da Cidade:")
     lbl_cod.grid(row=0, column=0, padx=10, pady=5, sticky="w")
     ent_cod = ctk.CTkEntry(tab)
     ent_cod.grid(row=0, column=1, padx=10, pady=5)
@@ -1890,19 +1890,19 @@ def tela_inserir():
     tabview.pack(fill="both")
     tabview.add("Alunos")
     tabview.add("Professores")
-    tabview.add("Matricula")
+    tabview.add("Matrícula")
     tabview.add("Modalidade")
     tabview.add("Cidade")
     tabview.tab("Alunos").grid_columnconfigure(0, weight=1 )
     tabview.tab("Professores").grid_columnconfigure(0, weight=1)
-    tabview.tab("Matricula").grid_columnconfigure(0, weight=1)
+    tabview.tab("Matrícula").grid_columnconfigure(0, weight=1)
     tabview.tab("Modalidade").grid_columnconfigure(0, weight=1)
     tabview.tab("Cidade").grid_columnconfigure(0, weight=1)
 
     aba_inserir_alunos(tabview.tab("Alunos"))
     aba_inserir_professores(tabview.tab("Professores"))
     aba_inserir_modalidade(tabview.tab("Modalidade"))
-    aba_inserir_matricula(tabview.tab("Matricula"))
+    aba_inserir_matricula(tabview.tab("Matrícula"))
     aba_inserir_cidade(tabview.tab("Cidade"))
 
 def tela_buscar():
@@ -1925,12 +1925,12 @@ def tela_buscar():
     tabview.pack(fill="both")
     tabview.add("Alunos")
     tabview.add("Professores")
-    tabview.add("Matricula")
+    tabview.add("Matrícula")
     tabview.add("Modalidade")
     tabview.add("Cidade")
     tabview.tab("Alunos").grid_columnconfigure(0, weight=1)
     tabview.tab("Professores").grid_columnconfigure(0, weight=1)
-    tabview.tab("Matricula").grid_columnconfigure(0, weight=1)
+    tabview.tab("Matrícula").grid_columnconfigure(0, weight=1)
     tabview.tab("Modalidade").grid_columnconfigure(0, weight=1)
     tabview.tab("Cidade").grid_columnconfigure(0, weight=1)
 
@@ -1960,18 +1960,18 @@ def tela_deletar():
     tabview.pack(fill="both")
     tabview.add("Alunos")
     tabview.add("Professores")
-    tabview.add("Matricula")
+    tabview.add("Matrícula")
     tabview.add("Modalidade")
     tabview.add("Cidade")
     tabview.tab("Alunos").grid_columnconfigure(0, weight=1)
     tabview.tab("Professores").grid_columnconfigure(0, weight=1)
-    tabview.tab("Matricula").grid_columnconfigure(0, weight=1)
+    tabview.tab("Matrícula").grid_columnconfigure(0, weight=1)
     tabview.tab("Modalidade").grid_columnconfigure(0, weight=1)
     tabview.tab("Cidade").grid_columnconfigure(0, weight=1)
 
     aba_deletar_aluno(tabview.tab("Alunos"))
     aba_deletar_professores(tabview.tab("Professores"))
-    aba_deletar_matricula(tabview.tab("Matricula"))
+    aba_deletar_matricula(tabview.tab("Matrícula"))
     aba_deletar_modalidade(tabview.tab("Modalidade"))
     aba_deletar_cidade(tabview.tab("Cidade"))
 
@@ -2018,12 +2018,12 @@ def tela_leituraExaustiva():
     tabview.pack(fill="both")
     tabview.add("Alunos")
     tabview.add("Professores")
-    tabview.add("Matricula")
+    tabview.add("Matrícula")
     tabview.add("Modalidade")
     tabview.add("Cidade")
     tabview.tab("Alunos").grid_columnconfigure(0, weight=1)
     tabview.tab("Professores").grid_columnconfigure(0, weight=1)
-    tabview.tab("Matricula").grid_columnconfigure(0, weight=1)
+    tabview.tab("Matrícula").grid_columnconfigure(0, weight=1)
     tabview.tab("Modalidade").grid_columnconfigure(0, weight=1)
     tabview.tab("Cidade").grid_columnconfigure(0, weight=1)
 
@@ -2039,7 +2039,7 @@ btn_fatura= ctk.CTkButton(master=app, text="Total Faturado", command=tela_totalF
 #rodadpe
 rodape = ctk.CTkFrame(app, height=40, fg_color="#2e2e2e")
 rodape.pack(side="bottom", fill="x")
-label_rodape = ctk.CTkLabel(rodape, text="© 2025 Sistema Academia PowerOn - Arthur M. Rieger e Carlos E. Zaul ", text_color="white")
+label_rodape = ctk.CTkLabel(rodape, text="© 2025 Sistema de Academia PowerOn - Arthur M. Rieger e Carlos Eduardo Zaul D.", text_color="white")
 label_rodape.pack(pady=10)
 
 
