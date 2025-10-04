@@ -1194,8 +1194,8 @@ def leituraExaustivaMatriculas(output=None):
                 try:
                     cod = int(itens[0])
                     codAluno = int(itens[1])
-                    codModa = int(float(itens[2]))
-                    qtdAulas = int(float(itens[3]))
+                    codModa = int(itens[2])
+                    qtdAulas = int(itens[3])
                     matriculas.append((cod, codAluno, codModa, qtdAulas))
                 except:
                     continue
@@ -1227,7 +1227,7 @@ def leituraExaustivaMatriculas(output=None):
                     dadosAluno = linha.strip().split(";")
                     if len(dadosAluno) >= 6 and int(dadosAluno[0]) == codAluno:
                         nomeAluno = dadosAluno[1]
-                        codCidade = int(dadosAluno[5])
+                        codCidade = int(dadosAluno[2])
 
                         with open("dados/cidades.txt", "r", encoding="utf-8") as arqCid:
                             for linhaC in arqCid:
@@ -1242,9 +1242,9 @@ def leituraExaustivaMatriculas(output=None):
             with open("dados/modalidades.txt", "r", encoding="utf-8") as arqMod:
                 for linhaM in arqMod:
                     dadosMod = linhaM.strip().split(";")
-                    if len(dadosMod) >= 6 and int(dadosMod[0]) == codMod:
+                    if len(dadosMod) >= 6 and int(float(dadosMod[0])) == codMod:
                         descModalidade = dadosMod[1]
-                        codProfessor = int(dadosMod[2])
+                        codProfessor = int(float(dadosMod[2]))
                         valorModalidade = float(dadosMod[3])
                         break
 
